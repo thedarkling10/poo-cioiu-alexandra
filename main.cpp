@@ -1,57 +1,162 @@
 #include <iostream>
-#include <array>
+#include <vector>
+#include <string>
 
-#include <Helper.h>
+class Character {
+private:
+    int windowWidth;
+    int windowHeight;
+    std::vector<float> screenPos;
+    float width, height;
+    float scale{4.0f};
+    float health{100.0f};
+    bool alive{true};
+
+public:
+
+    Character(int winWidth, int winHeight) : windowWidth(winWidth), windowHeight(winHeight),
+      screenPos{float(winWidth) / 2, float(winHeight) / 2} {}
+
+
+    Character(const Character& other): windowWidth{other.windowWidth}, windowHeight{other.windowHeight}, scale{other.scale},
+        health{other.health}, alive{other.alive}, screenPos{other.screenPos}, width{other.width}, height{other.height} {
+        std::cout << "Constr de copiere Character\n";
+
+    }
+
+    Character& operator=(const Character& other) {
+        std::cout << "operator = copiere Character\n";
+        windowWidth = other.windowWidth, windowHeight = other.windowHeight, scale = other.scale,
+        health = other.health, alive = other.alive, screenPos = other.screenPos, width = other.width, height = other.height;
+        return *this;
+    }
+
+    ~Character() {}
+
+    void takeDamage(float damage) {
+        health -= damage;
+        if (health <= 0.0f) alive = false;
+    }
+
+    bool isAlive() const { return alive; }
+};
+
+class Enemy {
+private:
+    std::vector<float> worldPos{};
+    float width{}, height{};
+    float speed{3.5f};
+    float health{100.0f};
+    bool alive{true};
+    float damagePerSec{10.0f};
+    float radius{50.0f};
+
+public:
+    Enemy(std::vector<float> pos) : worldPos(pos) {}
+
+    Enemy(const Enemy& other):
+        worldPos(other.worldPos), width(other.width), height(other.height),
+        speed(other.speed), health(other.health), alive(other.alive),
+        damagePerSec(other.damagePerSec), radius(other.radius) {
+        std::cout << "Constr de copiere Enemy\n";
+    }
+
+    Enemy& operator=(const Enemy& other) {
+        std::cout << "operator = copiere Enemy\n";
+        if (this == &other) {
+            worldPos = other.worldPos;
+            width = other.width;
+            height = other.height;
+            speed = other.speed;
+            health = other.health;
+            alive = other.alive;
+            damagePerSec = other.damagePerSec;
+            radius = other.radius;
+        }
+            return *this;
+    }
+
+    ~Enemy() {}
+
+    void tick(float deltaTime) {
+        if (!alive) return;
+    }
+
+    void takeDamage(float damage) {
+        health -= damage;
+        if (health <= 0.0f) alive = false;
+    }
+
+    bool isAlive() const { return alive; }
+};
+
+class Prop {
+private:
+    std::vector<float> worldPos{};
+    float scale{4.0f};
+    std::string texture;
+    std::string name;
+
+public:
+    /*Prop(std::vector<float> pos, std::string tex, std::string n):
+        worldPos(pos),
+        //texture(tex),
+        name(n){} */
+    Prop(std::vector<float> pos, std::string n) : worldPos(pos), name(n) {}
+
+    std::vector<float> getWorldPos() const { return worldPos; }
+    std::string getTexture() const { return texture; }
+    std::string getName() const { return name; }
+
+    Prop(const Prop& other): worldPos(other.worldPos), scale(other.scale), name(other.name)
+    //texture(other.texture)
+    {
+        std::cout << "Constr de copiere Prop\n";
+    }
+
+    Prop& operator=(const Prop& other) {
+        std::cout << "operator = copiere Prop\n";
+        if (this == &other) {
+            worldPos = other.worldPos;
+            scale = other.scale;
+            name = other.name;
+            //texture = other.texture;
+        }
+        return *this;
+    }
+
+    void printPos() const {
+        std::cout << "The tree " << name << " is located at " << worldPos[0] << "," << worldPos[1] << "\n";
+    }
+
+};
+
+/*class Item {
+private:
+
+public:
+
+}; */
 
 int main() {
-    std::cout << "Hello, world!\n";
-    std::array<int, 100> v{};
-    int nr;
-    std::cout << "Introduceți nr: ";
-    /////////////////////////////////////////////////////////////////////////
-    /// Observație: dacă aveți nevoie să citiți date de intrare de la tastatură,
-    /// dați exemple de date de intrare folosind fișierul tastatura.txt
-    /// Trebuie să aveți în fișierul tastatura.txt suficiente date de intrare
-    /// (în formatul impus de voi) astfel încât execuția programului să se încheie.
-    /// De asemenea, trebuie să adăugați în acest fișier date de intrare
-    /// pentru cât mai multe ramuri de execuție.
-    /// Dorim să facem acest lucru pentru a automatiza testarea codului, fără să
-    /// mai pierdem timp de fiecare dată să introducem de la zero aceleași date de intrare.
-    ///
-    /// Pe GitHub Actions (bife), fișierul tastatura.txt este folosit
-    /// pentru a simula date introduse de la tastatură.
-    /// Bifele verifică dacă programul are erori de compilare, erori de memorie și memory leaks.
-    ///
-    /// Dacă nu puneți în tastatura.txt suficiente date de intrare, îmi rezerv dreptul să vă
-    /// testez codul cu ce date de intrare am chef și să nu pun notă dacă găsesc vreun bug.
-    /// Impun această cerință ca să învățați să faceți un demo și să arătați părțile din
-    /// program care merg (și să le evitați pe cele care nu merg).
-    ///
-    /////////////////////////////////////////////////////////////////////////
-    std::cin >> nr;
-    /////////////////////////////////////////////////////////////////////////
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "v[" << i << "] = ";
-        std::cin >> v[i];
-    }
-    std::cout << "\n\n";
-    std::cout << "Am citit de la tastatură " << nr << " elemente:\n";
-    for(int i = 0; i < nr; ++i) {
-        std::cout << "- " << v[i] << "\n";
-    }
-    ///////////////////////////////////////////////////////////////////////////
-    /// Pentru date citite din fișier, NU folosiți tastatura.txt. Creați-vă voi
-    /// alt fișier propriu cu ce alt nume doriți.
-    /// Exemplu:
-    /// std::ifstream fis("date.txt");
-    /// for(int i = 0; i < nr2; ++i)
-    ///     fis >> v2[i];
-    ///
-    ///////////////////////////////////////////////////////////////////////////
-    ///                Exemplu de utilizare cod generat                     ///
-    ///////////////////////////////////////////////////////////////////////////
-    Helper helper;
-    helper.help();
-    ///////////////////////////////////////////////////////////////////////////
-    return 0;
+    int windowWidth = 800, windowHeight = 600;
+    Character knight1{windowWidth, windowHeight};
+    Character knight2=knight1;
+
+    Character knight3{1024, 768};
+    knight3 = knight1;
+
+    Enemy goblin({10.0f, 20.0f});
+    Enemy goblin2 = goblin;
+    Enemy goblin3({30.0f, 40.0f});
+    goblin3 = goblin;
+
+    Prop tree({100.0f, 200.0f}, "Oak");
+    tree.printPos();
+
+    Prop tree2({25.0f, 35.0f}, "Birch");
+    tree2 = tree;
+
+    tree2.printPos();
 }
+
