@@ -9,7 +9,8 @@ private:
     std::string name;
 
 public:
-    Prop(std::vector<float> pos, std::string n) : worldPos(pos), name(n) {}
+    Prop(std::vector<float> pos, std::string n)
+        : worldPos(std::move(pos)), name(std::move(n)) {}
 
     Prop(const Prop& other) : worldPos(other.worldPos), scale(other.scale), name(other.name) {
         std::cout << "Constr de copiere Prop\n";
@@ -54,19 +55,19 @@ private:
     float scale{4.0f};
     float health{100.0f};
     bool alive{true};
-    Prop* weapon{nullptr};
+    Prop weapon;
 
 public:
-    Character(int winWidth, int winHeight, Prop* w)
-        : windowWidth(winWidth), windowHeight(winHeight), screenPos{float(winWidth) / 2, float(winHeight) / 2} {
-        weapon = (w ? new Prop(*w) : nullptr);
-    }
+    Character(int winWidth, int winHeight, const Prop& w)
+        : windowWidth(winWidth), windowHeight(winHeight),
+          screenPos{static_cast<float>(winWidth) / 2, static_cast<float>(winHeight) / 2},
+          weapon(w) {}
 
     Character(const Character& other)
         : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
           screenPos(other.screenPos), width(other.width), height(other.height),
-          scale(other.scale), health(other.health), alive(other.alive) {
-        weapon = (other.weapon ? new Prop(*other.weapon) : nullptr);
+          scale(other.scale), health(other.health), alive(other.alive),
+          weapon(other.weapon) {
         std::cout << "Constr de copiere Character\n";
     }
 
@@ -80,35 +81,7 @@ public:
             scale = other.scale;
             health = other.health;
             alive = other.alive;
-
-            delete weapon;
-            weapon = (other.weapon ? new Prop(*other.weapon) : nullptr);
-        }
-        return *this;
-    }
-
-    Character(Character&& other) noexcept
-        : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
-          screenPos(std::move(other.screenPos)), width(other.width), height(other.height),
-          scale(other.scale), health(other.health), alive(other.alive), weapon(other.weapon) {
-        other.weapon = nullptr; // Prevenim double delete
-        std::cout << "Constr de mutare Character\n";
-    }
-
-    Character& operator=(Character&& other) noexcept {
-        if (this != &other) {
-            windowWidth = other.windowWidth;
-            windowHeight = other.windowHeight;
-            screenPos = std::move(other.screenPos);
-            width = other.width;
-            height = other.height;
-            scale = other.scale;
-            health = other.health;
-            alive = other.alive;
-
-            delete weapon;
             weapon = other.weapon;
-            other.weapon = nullptr;
         }
         return *this;
     }
@@ -127,12 +100,7 @@ public:
             os << character.screenPos[i];
             if (i < character.screenPos.size() - 1) os << ", ";
         }
-        os << "], ";
-
-        if (character.weapon)
-            os << "weapon: " << *character.weapon;
-        else
-            os << "weapon: None";
+        os << "], weapon: " << character.weapon;
         return os;
     }
 
@@ -148,18 +116,12 @@ public:
         screenPos[0] += dx;
         screenPos[1] += dy;
     }
-
-    ~Character() {
-        delete weapon;
-    }
 };
 
 int main() {
     Prop sword({50.0f, 60.0f}, "Sword");
-    Character knight1{800, 600, &sword};
+    Character knight1{800, 600, sword};
     Character knight2 = knight1;
-    Character knight3{1024, 768, new Prop({30.0f, 40.0f}, "Axe")};
-    knight3 = knight1;
 
     std::cout << knight1 << "\n";
 
