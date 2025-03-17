@@ -9,7 +9,6 @@ private:
     std::string name;
 
 public:
-
     Prop(std::vector<float> pos, std::string n) : worldPos(pos), name(n) {}
 
     Prop(const Prop& other) : worldPos(other.worldPos), scale(other.scale), name(other.name) {
@@ -17,7 +16,6 @@ public:
     }
 
     Prop& operator=(const Prop& other) {
-        std::cout << "operator = copiere Prop\n";
         if (this != &other) {
             worldPos = other.worldPos;
             scale = other.scale;
@@ -27,8 +25,7 @@ public:
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Prop& prop) {
-        os <<  prop.name;
-        os << ", worldPos: [";
+        os << prop.name << ", worldPos: [";
         for (size_t i = 0; i < prop.worldPos.size(); i++) {
             os << prop.worldPos[i];
             if (i < prop.worldPos.size() - 1) os << ", ";
@@ -57,30 +54,61 @@ private:
     float scale{4.0f};
     float health{100.0f};
     bool alive{true};
-    Prop* weapon;
+    Prop* weapon{nullptr};
 
 public:
-    Character(int winWidth, int winHeight, Prop* weapon) : windowWidth(winWidth), windowHeight(winHeight), weapon(weapon),
-                                             screenPos{float(winWidth) / 2, float(winHeight) / 2} {}
+    Character(int winWidth, int winHeight, Prop* w)
+        : windowWidth(winWidth), windowHeight(winHeight), screenPos{float(winWidth) / 2, float(winHeight) / 2} {
+        weapon = (w ? new Prop(*w) : nullptr);
+    }
 
-    Character(const Character& other) : windowWidth{other.windowWidth}, windowHeight{other.windowHeight},
-                                        scale{other.scale}, health{other.health}, alive{other.alive},
-                                        screenPos{other.screenPos}, width{other.width}, height{other.height} {
+    Character(const Character& other)
+        : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
+          screenPos(other.screenPos), width(other.width), height(other.height),
+          scale(other.scale), health(other.health), alive(other.alive) {
+        weapon = (other.weapon ? new Prop(*other.weapon) : nullptr);
         std::cout << "Constr de copiere Character\n";
     }
 
-
     Character& operator=(const Character& other) {
-        std::cout << "operator = copiere Character\n";
         if (this != &other) {
             windowWidth = other.windowWidth;
             windowHeight = other.windowHeight;
-            scale = other.scale;
-            health = other.health;
-            alive = other.alive;
             screenPos = other.screenPos;
             width = other.width;
             height = other.height;
+            scale = other.scale;
+            health = other.health;
+            alive = other.alive;
+
+            delete weapon;
+            weapon = (other.weapon ? new Prop(*other.weapon) : nullptr);
+        }
+        return *this;
+    }
+
+    Character(Character&& other) noexcept
+        : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
+          screenPos(std::move(other.screenPos)), width(other.width), height(other.height),
+          scale(other.scale), health(other.health), alive(other.alive), weapon(other.weapon) {
+        other.weapon = nullptr; // Prevenim double delete
+        std::cout << "Constr de mutare Character\n";
+    }
+
+    Character& operator=(Character&& other) noexcept {
+        if (this != &other) {
+            windowWidth = other.windowWidth;
+            windowHeight = other.windowHeight;
+            screenPos = std::move(other.screenPos);
+            width = other.width;
+            height = other.height;
+            scale = other.scale;
+            health = other.health;
+            alive = other.alive;
+
+            delete weapon;
+            weapon = other.weapon;
+            other.weapon = nullptr;
         }
         return *this;
     }
@@ -92,7 +120,7 @@ public:
         os << "width: " << character.width << ", ";
         os << "scale: " << character.scale << ", ";
         os << "health: " << character.health << ", ";
-        os << "alive: " << (character.alive ? "Yes\n" : "No\n");
+        os << "alive: " << (character.alive ? "Yes" : "No") << ", ";
 
         os << "screenPos: [";
         for (size_t i = 0; i < character.screenPos.size(); i++) {
@@ -102,9 +130,9 @@ public:
         os << "], ";
 
         if (character.weapon)
-            os << ", weapon: " << *character.weapon;
+            os << "weapon: " << *character.weapon;
         else
-            os << ", weapon: None";
+            os << "weapon: None";
         return os;
     }
 
@@ -121,68 +149,16 @@ public:
         screenPos[1] += dy;
     }
 
-
-    ~Character() = default;
-};
-
-class Enemy {
-private:
-    std::vector<float> worldPos;
-    float width{}, height{};
-    float speed{3.5f};
-    float health{100.0f};
-    bool alive{true};
-    float damagePerSec{10.0f};
-    float radius{50.0f};
-
-public:
-    Enemy(std::vector<float> pos) : worldPos(pos) {}
-
-    Enemy(const Enemy& other) : worldPos(other.worldPos), width(other.width), height(other.height),
-                                speed(other.speed), health(other.health), alive(other.alive),
-                                damagePerSec(other.damagePerSec), radius(other.radius) {
-        std::cout << "Constr de copiere Enemy\n";
+    ~Character() {
+        delete weapon;
     }
-
-    Enemy& operator=(const Enemy& other) {
-        std::cout << "operator = copiere Enemy\n";
-        if (this != &other) {
-            worldPos = other.worldPos;
-            width = other.width;
-            height = other.height;
-            speed = other.speed;
-            health = other.health;
-            alive = other.alive;
-            damagePerSec = other.damagePerSec;
-            radius = other.radius;
-        }
-        return *this;
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const Enemy& enemy) {
-        os << "Enemy -> worldPos: [";
-        for (size_t i = 0; i < enemy.worldPos.size(); i++) {
-            os << enemy.worldPos[i];
-            if (i < enemy.worldPos.size() - 1) os << ", ";
-        }
-        os << "], width: " << enemy.width;
-        os << ", height: " << enemy.height;
-        os << ", speed: " << enemy.speed;
-        os << ", health: " << enemy.health;
-        os << ", alive: " << (enemy.alive ? "Yes" : "No");
-        os << ", damagePerSec: " << enemy.damagePerSec;
-        os << ", radius: " << enemy.radius;
-        return os;
-    }
-
-    ~Enemy() = default;
 };
 
 int main() {
-    Prop* sword = new Prop({50.0f, 60.0f}, "Sword");
-    Character knight1{800, 600, sword};
+    Prop sword({50.0f, 60.0f}, "Sword");
+    Character knight1{800, 600, &sword};
     Character knight2 = knight1;
-    Character knight3{1024, 768,sword};
+    Character knight3{1024, 768, new Prop({30.0f, 40.0f}, "Axe")};
     knight3 = knight1;
 
     std::cout << knight1 << "\n";
@@ -192,13 +168,6 @@ int main() {
 
     knight1.move(10, -5);
     std::cout << knight1 << "\n";
-
-    Enemy goblin({10.0f, 20.0f});
-    Enemy goblin2 = goblin;
-    Enemy goblin3({30.0f, 40.0f});
-    goblin3 = goblin;
-
-    std::cout << goblin << "\n";
 
     Prop tree({100.0f, 200.0f}, "Oak");
     tree.printPos();
