@@ -184,6 +184,7 @@ int main() {
     Character knight2 = knight1;
 
     std::cout << knight1 << "\n";
+    std::cout << knight2 << "\n";
 
     knight1.takeDamage(20);
     std::cout << knight1 << "\n";
