@@ -118,6 +118,66 @@ public:
     }
 };
 
+class Enemy {
+private:
+    std::vector<float> worldPos;
+    float width{}, height{};
+    float speed{3.5f};
+    float health{100.0f};
+    bool alive{true};
+    float damagePerSec{10.0f};
+    float radius{50.0f};
+
+public:
+    Enemy(std::vector<float> pos) : worldPos(std::move(pos)) {}
+
+    Enemy(const Enemy& other) : worldPos(other.worldPos), width(other.width), height(other.height),
+                                speed(other.speed), health(other.health), alive(other.alive),
+                                damagePerSec(other.damagePerSec), radius(other.radius) {
+        std::cout << "Constr de copiere Enemy\n";
+    }
+
+    Enemy& operator=(const Enemy& other) {
+        if (this != &other) {
+            worldPos = other.worldPos;
+            width = other.width;
+            height = other.height;
+            speed = other.speed;
+            health = other.health;
+            alive = other.alive;
+            damagePerSec = other.damagePerSec;
+            radius = other.radius;
+        }
+        return *this;
+    }
+
+    void attack(Character& target) {
+        if (alive) {
+            std::cout << "Enemy attacks:" << damagePerSec << " damage!\n";
+            target.takeDamage(damagePerSec);
+        }
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Enemy& enemy) {
+        os << "Enemy -> worldPos: [";
+        for (size_t i = 0; i < enemy.worldPos.size(); i++) {
+            os << enemy.worldPos[i];
+            if (i < enemy.worldPos.size() - 1) os << ", ";
+        }
+        os << "], width: " << enemy.width;
+        os << ", height: " << enemy.height;
+        os << ", speed: " << enemy.speed;
+        os << ", health: " << enemy.health;
+        os << ", alive: " << (enemy.alive ? "Yes" : "No");
+        os << ", damagePerSec: " << enemy.damagePerSec;
+        os << ", radius: " << enemy.radius;
+        return os;
+    }
+
+    ~Enemy() = default;
+};
+
+
 int main() {
     Prop sword({50.0f, 60.0f}, "Sword");
     Character knight1{800, 600, sword};
@@ -138,6 +198,12 @@ int main() {
     tree2.printPos();
 
     std::cout << tree << "\n";
+
+    Enemy goblin({300.0f, 400.0f});
+    std::cout << goblin << "\n";
+
+    goblin.attack(knight1);
+    std::cout << knight1 << "\n";
 
     return 0;
 }
