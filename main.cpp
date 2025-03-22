@@ -129,7 +129,7 @@ private:
     float radius{50.0f};
 
 public:
-    Enemy(std::vector<float> pos) : worldPos(std::move(pos)) {}
+    explicit Enemy(std::vector<float> pos) : worldPos(std::move(pos)) {}
 
     Enemy(const Enemy& other) : worldPos(other.worldPos), width(other.width), height(other.height),
                                 speed(other.speed), health(other.health), alive(other.alive),
@@ -151,9 +151,9 @@ public:
         return *this;
     }
 
-    void attack(Character& target) {
+    void attack(Character& target) const {
         if (alive) {
-            std::cout << "Enemy attacks:" << damagePerSec << " damage!\n";
+            std::cout << "Enemy attacks and deals " << damagePerSec << " damage!\n";
             target.takeDamage(damagePerSec);
         }
     }
@@ -176,6 +176,7 @@ public:
 
     ~Enemy() = default;
 };
+
 
 
 int main() {
