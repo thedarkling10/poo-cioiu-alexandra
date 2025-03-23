@@ -117,7 +117,8 @@ public:
         screenPos[1] += dy;
     }
 
-    [[nodiscard]] std::vector<float> getPosition() const {return screenPos;};
+    [[nodiscard]] const std::vector<float>& getPosition() const { return screenPos; };
+
 
 };
 
@@ -177,6 +178,8 @@ public:
         return os;
     }
 
+    [[nodiscard]]bool isDead() const {return health <= 0;}
+
     ~Enemy() = default;
 };
 
@@ -193,7 +196,7 @@ class Item {
         : name(std::move(n)), worldPos(std::move(pos)), damage(dmg), healAmount(heal), equipped(false) {
 
         std::string response;
-        std::cout << "Do you want to equip " << name << "? (yes/no): ";
+        std::cout << "Do you want to pick up " << name << "? (yes/no): ";
         std::cin >> response;
 
         if (response == "yes") {
@@ -256,6 +259,41 @@ class Item {
         }
     }
 
+    void dropItem(float x, float y) {
+        equipped = false;
+        worldPos = {x, y};
+        std::cout << name << " has been dropped at [" << x << ", " << y << "]\n";
+    }
+
+    void upgradeItem(float percent) {
+        if (percent <= 0) {
+            std::cout << "Cannot upgrade item!";
+            return ;
+        }
+
+        damage += damage * (percent / 100.0f);
+        healAmount += healAmount * (percent / 100.0f);
+
+        std::cout << name << " gained an improvement! View stats?(yes/no)";
+        std::string response;
+        std::cin >> response;
+        if (response == "yes")
+            std::cout << "New stats:\n Damage = " << damage << ", Heal = " << healAmount << "\n";
+    }
+
+
+    void degradeItem(float percent) {
+        if (percent <= 0) {
+        std::cout << "Error degrading item!";
+        return ;}
+
+        damage -= damage * (percent / 100.0f);
+        healAmount -= healAmount * (percent / 100.0f);
+
+        std::cout << name << " is wearing out! New stats:\n Damage = " << damage << ", Heal = " << healAmount << "\n";
+    }
+
+
 };
 
 class Obstacle {
@@ -296,10 +334,10 @@ public:
 
     void printPos() const {
         if (position.size() < 2) {
-            std::cout << "Pozitie invalida pentru " << name << "\n";
+            std::cout << "Invalid position for " << name << "\n";
             return;
         }
-        std::cout << name << " este situat la " << position[0] << ", " << position[1] << "\n";
+        std::cout << name << " is situated at " << position[0] << ", " << position[1] << "\n";
     }
 
     [[nodiscard]] bool reach(float x, float y) const {
@@ -348,6 +386,9 @@ int main() {
     Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f);
     Item potion("XP", {5.0f, 15.0f}, 0.0f, 25.0f);
 
+    superSword.upgradeItem(10);
+    superSword.degradeItem(5);
+
     std::cout << superSword << "\n";
     std::cout << potion << "\n";
 
@@ -359,6 +400,7 @@ int main() {
 
     updatedSword.equipItem();
     potion.unequipItem();
+    potion.dropItem(10.0f, 20.0f);
 
     Obstacle obstacle1({8.0f, 8.0f}, "Obstacle1");
 
