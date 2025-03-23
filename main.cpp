@@ -89,6 +89,7 @@ public:
             health = other.health;
             alive = other.alive;
             weapon = other.weapon;
+            framesSinceLastHeal = other.framesSinceLastHeal;
         }
         return *this;
     }
