@@ -333,7 +333,11 @@ class Item {
         }
         else if (name == "Masamune") {
             float specialDamage = damage * 1.5f;
-            std::cout << "Special attack with" << name << " applied! Damame: " << specialDamage << "\n";
+            std::cout << "Special attack with " << name << " applied! Damame: " << specialDamage << "\n";
+        }
+        else if (name == "Wallace") {
+            float specialDamage = damage * 1.3f;
+            std::cout << "Special attack with " << name << " applied! Damage: " << specialDamage << "\n";
         }
         else
             std::cout << name << " does not have any special attacks!\n";
@@ -449,9 +453,11 @@ int main() {
     std::cout << knight1 << "\n";
 
     Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f);
+    Item superSword2("Wallace", {10.0f, 15.0f}, 40.0f, 0.0f);
     Item potion("XP", {5.0f, 15.0f}, 0.0f, 25.0f);
 
     superSword.specialAttack();
+    superSword2.specialAttack();
 
     superSword.upgradeItem(10);
     superSword.degradeItem(5);
