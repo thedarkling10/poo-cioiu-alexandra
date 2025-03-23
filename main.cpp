@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ranges>
 #include <vector>
 #include <string>
 
@@ -56,6 +57,9 @@ private:
     float health{100.0f};
     bool alive{true};
     Prop weapon;
+
+    int framesSinceLastHeal{0};
+    const int healCooldownFrames{60 * 60};
 
 public:
     Character(int winWidth, int winHeight, const Prop& w)
@@ -119,6 +123,27 @@ public:
 
     [[nodiscard]] const std::vector<float>& getPosition() const { return screenPos; };
 
+    void autoHeal() {
+        if (!alive) return;
+
+        if (framesSinceLastHeal >= healCooldownFrames) {
+            heal(10.0f);
+            framesSinceLastHeal = 0;
+        }
+    }
+
+    void heal(float amount) {
+        health += amount;
+        if (health > 100.0f) {
+            health = 100.0f;
+        }
+        std::cout << "Character healed by " << amount << ". Current health: " << health << "\n";
+    }
+
+    void update() {
+        framesSinceLastHeal++;
+    }
+
 
 };
 
@@ -157,7 +182,7 @@ public:
 
     void attack(Character& target) const {
         if (alive) {
-            std::cout << "Enemy attacks and deals " << damagePerSec << " damage!\n";
+            std::cout << "Enemy attacks! You lost " << damagePerSec << " damage diva!\n";
             target.takeDamage(damagePerSec);
         }
     }
@@ -356,10 +381,25 @@ public:
 
 
 int main() {
+
     Prop sword({50.0f, 60.0f}, "Sword");
     Character knight1{800, 600, sword};
-    Character knight2 = knight1;
 
+    bool gameRunning = true;
+    int frames = 0;
+
+    while (gameRunning) {
+        frames++;
+        knight1.update();
+        knight1.autoHeal();
+
+        if (frames > 180)
+            gameRunning = false;
+
+        /* simulare -> urmeaza imbunatatiri si functionalitati implementate in tema urmatoare (that will hopefully work) :)*/
+    }
+
+    Character knight2 = knight1;
     std::cout << knight1 << "\n";
     std::cout << knight2 << "\n";
 
@@ -379,6 +419,9 @@ int main() {
 
     Enemy goblin({300.0f, 400.0f});
     std::cout << goblin << "\n";
+
+    if (goblin.isDead())
+        std::cout << "Goblin down. Keep the fight going diva!\n";
 
     goblin.attack(knight1);
     std::cout << knight1 << "\n";
