@@ -44,6 +44,9 @@ public:
         std::cout << "The tree " << name << " is located at " << worldPos[0] << "," << worldPos[1] << "\n";
     }
 
+    [[nodiscard]] const std::string& getName() const {
+        return name;
+    }
     ~Prop() = default;
 };
 
@@ -58,8 +61,8 @@ private:
     bool alive{true};
     Prop weapon;
 
-    int framesSinceLastHeal{0};
-    const int healCooldownFrames{60 * 60};
+    int framesSinceLastHeal = 0;
+    const int maximumFrames = 3600;
 
 public:
     Character(int winWidth, int winHeight, const Prop& w)
@@ -68,10 +71,10 @@ public:
           weapon(w) {}
 
     Character(const Character& other)
-        : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
-          screenPos(other.screenPos), width(other.width), height(other.height),
-          scale(other.scale), health(other.health), alive(other.alive),
-          weapon(other.weapon) {
+    : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
+      screenPos(other.screenPos), width(other.width), height(other.height),
+      scale(other.scale), health(other.health), alive(other.alive),
+      weapon(other.weapon) {
         std::cout << "Constr de copiere Character\n";
     }
 
@@ -126,7 +129,7 @@ public:
     void autoHeal() {
         if (!alive) return;
 
-        if (framesSinceLastHeal >= healCooldownFrames) {
+        if (framesSinceLastHeal >= maximumFrames) {
             heal(10.0f);
             framesSinceLastHeal = 0;
         }
@@ -144,6 +147,10 @@ public:
         framesSinceLastHeal++;
     }
 
+    void attack() const {
+        std::cout << "Knight attacks with " << weapon.getName() << "!\n";
+        weapon.printPos();
+    }
 
 };
 
@@ -318,6 +325,12 @@ class Item {
         std::cout << name << " is wearing out! New stats:\n Damage = " << damage << ", Heal = " << healAmount << "\n";
     }
 
+    void specialAttack()const {
+        if (name == "Sword") {
+            float specialDamage = damage * 2.0f;
+            std::cout << "Special attack with " << name << " applied! Damage: " << specialDamage << "\n";
+        }
+    }
 
 };
 
@@ -402,6 +415,8 @@ int main() {
     Character knight2 = knight1;
     std::cout << knight1 << "\n";
     std::cout << knight2 << "\n";
+
+    knight1.attack();
 
     knight1.takeDamage(20);
     std::cout << knight1 << "\n";
