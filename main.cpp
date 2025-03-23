@@ -104,10 +104,10 @@ public:
         return os;
     }
 
-    void takeDamage(float amount) {
-        health -= amount;
-        if (health <= 0) {
-            health = 0;
+    void takeDamage(float damage) {
+        health -= damage;
+        if (health <= 0.f) {
+            health = 0.f;
             alive = false;
         }
     }
@@ -186,9 +186,20 @@ class Item {
     bool equipped;
 
     public:
-    explicit Item(std::string n, std::vector<float> pos, float dmg, float heal, bool eq = false)
-        : name(std::move(n)), worldPos(std::move(pos)), damage(dmg), healAmount(heal), equipped(eq) {}
+    Item(std::string n, std::vector<float> pos, float dmg, float heal)
+        : name(std::move(n)), worldPos(std::move(pos)), damage(dmg), healAmount(heal), equipped(false) {
 
+        std::string response;
+        std::cout << "Do you want to equip " << name << "? (yes/no): ";
+        std::cin >> response;
+
+        if (response == "yes") {
+            equipped = true;
+            std::cout << name << " has been equipped!\n";
+        } else {
+            std::cout << name << " is not equipped.\n";
+        }
+    }
     Item(const Item& other)
         : name(other.name), worldPos(other.worldPos), damage(other.damage),
           healAmount(other.healAmount), equipped(other.equipped) {
@@ -224,6 +235,23 @@ class Item {
         std::cout << "Destructor Item\n";
     }
 
+    void equipItem() {
+        if (!equipped) {
+            equipped = true;
+            std::cout << name << " is now equipped!\n";
+        } else {
+            std::cout << name << " is already equipped!\n";
+        }
+    }
+
+    void unequipItem() {
+        if (equipped) {
+            equipped = false;
+            std::cout << name << " is now unequipped!\n";
+        } else {
+            std::cout << name << " is not equipped!\n";
+        }
+    }
 
 };
 
@@ -255,17 +283,19 @@ int main() {
     goblin.attack(knight1);
     std::cout << knight1 << "\n";
 
-    Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f, true);
-    Item potion("XP", {5.0f, 15.0f}, 0.0f, 25.0f, false);
+    Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f);
+    Item potion("XP", {5.0f, 15.0f}, 0.0f, 25.0f);
 
     std::cout << superSword << "\n";
     std::cout << potion << "\n";
 
-    //Item updatedSword = superSword;
+    Item updatedSword = superSword;
     potion = superSword;
 
     std::cout << potion << "\n";
-    //std::cout << updatedSword << "\n";
+    std::cout << updatedSword << "\n";
+
+    updatedSword.equipItem();
 
     return 0;
 }
