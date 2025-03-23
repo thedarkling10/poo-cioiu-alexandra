@@ -177,7 +177,55 @@ public:
     ~Enemy() = default;
 };
 
+class Item {
+    private:
+    std::string name;
+    std::vector<float> worldPos;
+    float damage;
+    float healAmount;
+    bool equipped;
 
+    public:
+    explicit Item(std::string n, std::vector<float> pos, float dmg, float heal, bool eq = false)
+        : name(std::move(n)), worldPos(std::move(pos)), damage(dmg), healAmount(heal), equipped(eq) {}
+
+    Item(const Item& other)
+        : name(other.name), worldPos(other.worldPos), damage(other.damage),
+          healAmount(other.healAmount), equipped(other.equipped) {
+        std::cout << "Constr de copiere Item\n";
+    }
+
+    Item& operator=(const Item& other) {
+        std::cout << "Operator = copiere Item\n";
+        if (this != &other) {
+            name = other.name;
+            worldPos = other.worldPos;
+            damage = other.damage;
+            healAmount = other.healAmount;
+            equipped = other.equipped;
+        }
+        return *this;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Item& item) {
+        os << "Item -> Name: " << item.name
+           << ", Position: [";
+        for (size_t i = 0; i < item.worldPos.size(); i++) {
+            os << item.worldPos[i];
+            if (i < item.worldPos.size() - 1) os << ", ";
+        }
+        os << "], Damage: " << item.damage
+           << ", HealAmount: " << item.healAmount
+           << ", Equipped: " << (item.equipped ? "Yes" : "No");
+        return os;
+    }
+
+    ~Item() {
+        std::cout << "Destructor Item\n";
+    }
+
+
+};
 
 int main() {
     Prop sword({50.0f, 60.0f}, "Sword");
@@ -206,6 +254,18 @@ int main() {
 
     goblin.attack(knight1);
     std::cout << knight1 << "\n";
+
+    Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f, true);
+    Item potion("XP", {5.0f, 15.0f}, 0.0f, 25.0f, false);
+
+    std::cout << superSword << "\n";
+    std::cout << potion << "\n";
+
+    //Item updatedSword = superSword;
+    potion = superSword;
+
+    std::cout << potion << "\n";
+    //std::cout << updatedSword << "\n";
 
     return 0;
 }
