@@ -255,6 +255,59 @@ class Item {
 
 };
 
+class Obstacle {
+private:
+    std::vector<float> position;
+    float width{2.0f};
+    float height{2.0f};
+    std::string name;
+
+public:
+    Obstacle(std::vector<float> pos, std::string n)
+        : position(std::move(pos)), name(std::move(n)) {}
+
+    Obstacle(const Obstacle& other)
+        : position(other.position), width(other.width), height(other.height), name(other.name) {
+        std::cout << "Constr de copiere Obstacol\n";
+    }
+
+    Obstacle& operator=(const Obstacle& other) {
+        if (this != &other) {
+            position = other.position;
+            width = other.width;
+            height = other.height;
+            name = other.name;
+        }
+        return *this;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Obstacle& obs) {
+        os << obs.name << ", position: [";
+        for (size_t i = 0; i < obs.position.size(); i++) {
+            os << obs.position[i];
+            if (i < obs.position.size() - 1) os << ", ";
+        }
+        os << "], width: " << obs.width << ", height: " << obs.height;
+        return os;
+    }
+
+    void printPos() const {
+        if (position.size() < 2) {
+            std::cout << "Pozitie invalida pentru " << name << "\n";
+            return;
+        }
+        std::cout << name << " este situat la " << position[0] << ", " << position[1] << "\n";
+    }
+
+    [[nodiscard]] bool reach(float x, float y) const {
+        return x >= position[0] && x <= position[0] + width &&
+               y >= position[1] && y <= position[1] + height;
+    }
+
+    ~Obstacle() = default;
+};
+
+
 int main() {
     Prop sword({50.0f, 60.0f}, "Sword");
     Character knight1{800, 600, sword};
@@ -296,6 +349,19 @@ int main() {
     std::cout << updatedSword << "\n";
 
     updatedSword.equipItem();
+    potion.unequipItem();
+
+    Obstacle obstacle1({8.0f, 8.0f}, "Obstacle1");
+
+    Obstacle obstacle2({12.0f, 12.0f}, "Obstacle2");
+
+    std::cout << obstacle1 << std::endl;
+    std::cout << obstacle2 << std::endl;
+
+    if (obstacle1.reach(9.0f, 9.0f))
+        std::cout << "The character at point (9, 9) reached " << obstacle1 << std::endl;
+    else
+        std::cout << "The character at point (9, 9) did not reach " << obstacle1 << std::endl;
 
     return 0;
 }
