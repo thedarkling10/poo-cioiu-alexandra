@@ -116,6 +116,9 @@ public:
         screenPos[0] += dx;
         screenPos[1] += dy;
     }
+
+    [[nodiscard]] std::vector<float> getPosition() const {return screenPos;};
+
 };
 
 class Enemy {
@@ -300,8 +303,14 @@ public:
     }
 
     [[nodiscard]] bool reach(float x, float y) const {
-        return x >= position[0] && x <= position[0] + width &&
-               y >= position[1] && y <= position[1] + height;
+        return x >= position[0] && x <= position[0] + width && y >= position[1] && y <= position[1] + height;
+    }
+
+    void checkDangerZone(Character& character) const {
+        if (reach(character.getPosition()[0], character.getPosition()[1])) {
+            std::cout << "Character approached danger zone of " << name << "!\n";
+            character.takeDamage(10.0f);
+        }
     }
 
     ~Obstacle() = default;
@@ -362,6 +371,12 @@ int main() {
         std::cout << "The character at point (9, 9) reached " << obstacle1 << std::endl;
     else
         std::cout << "The character at point (9, 9) did not reach " << obstacle1 << std::endl;
+
+    obstacle1.checkDangerZone(knight1);
+    std::cout << knight1 << "\n";
+
+    knight1.move(9.0f - knight1.getPosition()[0], 9.0f - knight1.getPosition()[1]);
+    obstacle1.checkDangerZone(knight1);
 
     return 0;
 }
