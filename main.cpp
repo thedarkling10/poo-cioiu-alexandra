@@ -325,11 +325,17 @@ class Item {
         std::cout << name << " is wearing out! New stats:\n Damage = " << damage << ", Heal = " << healAmount << "\n";
     }
 
-    void specialAttack()const {
-        if (name == "Sword") {
+    void specialAttack() const {
+        if (name == "Excalibur") {
             float specialDamage = damage * 2.0f;
             std::cout << "Special attack with " << name << " applied! Damage: " << specialDamage << "\n";
         }
+        else if (name == "Masamune") {
+            float specialDamage = damage * 1.5f;
+            std::cout << "Special attack with" << name << " applied! Damame: " << specialDamage << "\n";
+        }
+        else
+            std::cout << name << " does not have any special attacks!\n";
     }
 
 };
@@ -443,6 +449,8 @@ int main() {
 
     Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f);
     Item potion("XP", {5.0f, 15.0f}, 0.0f, 25.0f);
+
+    superSword.specialAttack();
 
     superSword.upgradeItem(10);
     superSword.degradeItem(5);
