@@ -50,172 +50,6 @@ public:
     ~Prop() = default;
 };
 
-class Character {
-private:
-    int windowWidth;
-    int windowHeight;
-    std::vector<float> screenPos;
-    float width{}, height{};
-    float scale{4.0f};
-    float health{100.0f};
-    bool alive{true};
-    Prop weapon;
-
-    int framesSinceLastHeal = 0;
-    const int maximumFrames = 3600;
-
-public:
-    Character(int winWidth, int winHeight, const Prop& w)
-        : windowWidth(winWidth), windowHeight(winHeight),
-          screenPos{static_cast<float>(winWidth) / 2, static_cast<float>(winHeight) / 2},
-          weapon(w) {}
-
-    Character(const Character& other)
-    : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
-      screenPos(other.screenPos), width(other.width), height(other.height),
-      scale(other.scale), health(other.health), alive(other.alive),
-      weapon(other.weapon) {
-        std::cout << "Constr de copiere Character\n";
-    }
-
-    Character& operator=(const Character& other) {
-        if (this != &other) {
-            windowWidth = other.windowWidth;
-            windowHeight = other.windowHeight;
-            screenPos = other.screenPos;
-            width = other.width;
-            height = other.height;
-            scale = other.scale;
-            health = other.health;
-            alive = other.alive;
-            weapon = other.weapon;
-            framesSinceLastHeal = other.framesSinceLastHeal;
-        }
-        return *this;
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const Character& character) {
-        os << "Character -> windowWidth: " << character.windowWidth << ", ";
-        os << "windowHeight: " << character.windowHeight << ", ";
-        os << "height: " << character.height << ", ";
-        os << "width: " << character.width << ", ";
-        os << "scale: " << character.scale << ", ";
-        os << "health: " << character.health << ", ";
-        os << "alive: " << (character.alive ? "Yes" : "No") << ", ";
-
-        os << "screenPos: [";
-        for (size_t i = 0; i < character.screenPos.size(); i++) {
-            os << character.screenPos[i];
-            if (i < character.screenPos.size() - 1) os << ", ";
-        }
-        os << "], weapon: " << character.weapon;
-        return os;
-    }
-
-    void takeDamage(float damage) {
-        health -= damage;
-        if (health <= 0.f) {
-            health = 0.f;
-            alive = false;
-        }
-    }
-
-    void move(float dx, float dy) {
-        screenPos[0] += dx;
-        screenPos[1] += dy;
-    }
-
-    [[nodiscard]] const std::vector<float>& getPosition() const { return screenPos; };
-
-    void autoHeal() {
-        if (!alive) return;
-
-        if (framesSinceLastHeal >= maximumFrames) {
-            heal(10.0f);
-            framesSinceLastHeal = 0;
-        }
-    }
-
-    void heal(float amount) {
-        health += amount;
-        if (health > 100.0f) {
-            health = 100.0f;
-        }
-        std::cout << "Character healed by " << amount << ". Current health: " << health << "\n";
-    }
-
-    void update() {
-        framesSinceLastHeal++;
-    }
-
-    void attack() const {
-        std::cout << "Knight attacks with " << weapon.getName() << "!\n";
-        weapon.printPos();
-    }
-
-};
-
-class Enemy {
-private:
-    std::vector<float> worldPos;
-    float width{}, height{};
-    float speed{3.5f};
-    float health{100.0f};
-    bool alive{true};
-    float damagePerSec{10.0f};
-    float radius{50.0f};
-
-public:
-    explicit Enemy(std::vector<float> pos) : worldPos(std::move(pos)) {}
-
-    Enemy(const Enemy& other) : worldPos(other.worldPos), width(other.width), height(other.height),
-                                speed(other.speed), health(other.health), alive(other.alive),
-                                damagePerSec(other.damagePerSec), radius(other.radius) {
-        std::cout << "Constr de copiere Enemy\n";
-    }
-
-    Enemy& operator=(const Enemy& other) {
-        if (this != &other) {
-            worldPos = other.worldPos;
-            width = other.width;
-            height = other.height;
-            speed = other.speed;
-            health = other.health;
-            alive = other.alive;
-            damagePerSec = other.damagePerSec;
-            radius = other.radius;
-        }
-        return *this;
-    }
-
-    void attack(Character& target) const {
-        if (alive) {
-            std::cout << "Enemy attacks! You lost " << damagePerSec << " damage diva!\n";
-            target.takeDamage(damagePerSec);
-        }
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const Enemy& enemy) {
-        os << "Enemy -> worldPos: [";
-        for (size_t i = 0; i < enemy.worldPos.size(); i++) {
-            os << enemy.worldPos[i];
-            if (i < enemy.worldPos.size() - 1) os << ", ";
-        }
-        os << "], width: " << enemy.width;
-        os << ", height: " << enemy.height;
-        os << ", speed: " << enemy.speed;
-        os << ", health: " << enemy.health;
-        os << ", alive: " << (enemy.alive ? "Yes" : "No");
-        os << ", damagePerSec: " << enemy.damagePerSec;
-        os << ", radius: " << enemy.radius;
-        return os;
-    }
-
-    [[nodiscard]]bool isDead() const {return health <= 0;}
-
-    ~Enemy() = default;
-};
-
 class Item {
     private:
     std::string name;
@@ -268,6 +102,10 @@ class Item {
            << ", HealAmount: " << item.healAmount
            << ", Equipped: " << (item.equipped ? "Yes" : "No");
         return os;
+    }
+
+    [[nodiscard]]bool isEquipped() const {
+        return equipped;
     }
 
     ~Item() {
@@ -343,6 +181,197 @@ class Item {
             std::cout << name << " does not have any special attacks!\n";
     }
 
+    [[nodiscard]]std::string getName() const {
+        return name;
+    }
+
+
+};
+
+
+class Character {
+private:
+    int windowWidth;
+    int windowHeight;
+    std::vector<float> screenPos;
+    float width{}, height{};
+    float scale{4.0f};
+    float health{100.0f};
+    bool alive{true};
+    Prop weapon;
+
+    int framesSinceLastHeal = 0;
+    const int maximumFrames = 3600;
+
+    std::vector<Item> inventory;
+
+public:
+    Character(int winWidth, int winHeight, const Prop& w)
+        : windowWidth(winWidth), windowHeight(winHeight),
+          screenPos{static_cast<float>(winWidth) / 2, static_cast<float>(winHeight) / 2},
+          weapon(w) {}
+
+    Character(const Character& other)
+    : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
+      screenPos(other.screenPos), width(other.width), height(other.height),
+      scale(other.scale), health(other.health), alive(other.alive),
+      weapon(other.weapon) {
+        std::cout << "Constr de copiere Character\n";
+    }
+
+    Character& operator=(const Character& other) {
+        if (this != &other) {
+            windowWidth = other.windowWidth;
+            windowHeight = other.windowHeight;
+            screenPos = other.screenPos;
+            width = other.width;
+            height = other.height;
+            scale = other.scale;
+            health = other.health;
+            alive = other.alive;
+            weapon = other.weapon;
+            framesSinceLastHeal = other.framesSinceLastHeal;
+        }
+        return *this;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Character& character) {
+        os << "Character -> windowWidth: " << character.windowWidth << ", ";
+        os << "windowHeight: " << character.windowHeight << ", ";
+        os << "height: " << character.height << ", ";
+        os << "width: " << character.width << ", ";
+        os << "scale: " << character.scale << ", ";
+        os << "health: " << character.health << ", ";
+        os << "alive: " << (character.alive ? "Yes" : "No") << ", ";
+
+        os << "screenPos: [";
+        for (size_t i = 0; i < character.screenPos.size(); i++) {
+            os << character.screenPos[i];
+            if (i < character.screenPos.size() - 1) os << ", ";
+        }
+        os << "], weapon: " << character.weapon << "\n";
+
+        os << "Inventory:\n";
+        if (character.inventory.empty()) {
+            os << "  No items in inventory.\n";
+        } else {
+            for (const auto& item : character.inventory) {
+                os << "  " << item << "\n";
+            }
+        }
+
+        return os;
+    }
+
+
+    void takeDamage(float damage) {
+        health -= damage;
+        if (health <= 0.f) {
+            health = 0.f;
+            alive = false;
+        }
+    }
+
+    void move(float dx, float dy) {
+        screenPos[0] += dx;
+        screenPos[1] += dy;
+    }
+
+    [[nodiscard]] const std::vector<float>& getPosition() const { return screenPos; };
+
+    void autoHeal() {
+        if (!alive) return;
+
+        if (framesSinceLastHeal >= maximumFrames) {
+            heal(10.0f);
+            framesSinceLastHeal = 0;
+        }
+    }
+
+    void heal(float amount) {
+        health += amount;
+        if (health > 100.0f) {
+            health = 100.0f;
+        }
+        std::cout << "Character healed by " << amount << ". Current health: " << health << "\n";
+    }
+
+    void update() {
+        framesSinceLastHeal++;
+    }
+
+    void attack() const {
+        std::cout << "Knight attacks with " << weapon.getName() << "!\n";
+        weapon.printPos();
+    }
+
+    void addItemToInventory(const Item& item) {
+        inventory.push_back(item);
+        std::cout << item.getName() << " added to inventory.\n";
+    }
+
+
+};
+
+class Enemy {
+private:
+    std::vector<float> worldPos;
+    float width{}, height{};
+    float speed{3.5f};
+    float health{100.0f};
+    bool alive{true};
+    float damagePerSec{10.0f};
+    float radius{50.0f};
+
+public:
+    explicit Enemy(std::vector<float> pos) : worldPos(std::move(pos)) {}
+
+    Enemy(const Enemy& other) : worldPos(other.worldPos), width(other.width), height(other.height),
+                                speed(other.speed), health(other.health), alive(other.alive),
+                                damagePerSec(other.damagePerSec), radius(other.radius) {
+        std::cout << "Constr de copiere Enemy\n";
+    }
+
+    Enemy& operator=(const Enemy& other) {
+        if (this != &other) {
+            worldPos = other.worldPos;
+            width = other.width;
+            height = other.height;
+            speed = other.speed;
+            health = other.health;
+            alive = other.alive;
+            damagePerSec = other.damagePerSec;
+            radius = other.radius;
+        }
+        return *this;
+    }
+
+    void attack(Character& target) const {
+        if (alive) {
+            std::cout << "Enemy attacks! You lost " << damagePerSec << " damage diva!\n";
+            target.takeDamage(damagePerSec);
+        }
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Enemy& enemy) {
+        os << "Enemy -> worldPos: [";
+        for (size_t i = 0; i < enemy.worldPos.size(); i++) {
+            os << enemy.worldPos[i];
+            if (i < enemy.worldPos.size() - 1) os << ", ";
+        }
+        os << "], width: " << enemy.width;
+        os << ", height: " << enemy.height;
+        os << ", speed: " << enemy.speed;
+        os << ", health: " << enemy.health;
+        os << ", alive: " << (enemy.alive ? "Yes" : "No");
+        os << ", damagePerSec: " << enemy.damagePerSec;
+        os << ", radius: " << enemy.radius;
+        return os;
+    }
+
+    [[nodiscard]]bool isDead() const {return health <= 0;}
+
+    ~Enemy() = default;
 };
 
 class Obstacle {
@@ -453,7 +482,16 @@ int main() {
     std::cout << knight1 << "\n";
 
     Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f);
+
+    if (superSword.isEquipped())
+        knight1.addItemToInventory(superSword);
+    std::cout << knight1 << "\n";
+
     Item superSword2("Wallace", {10.0f, 15.0f}, 40.0f, 0.0f);
+    if (superSword2.isEquipped())
+        knight1.addItemToInventory(superSword2);
+    std::cout << knight1 << "\n";
+
     Item potion("XP", {5.0f, 15.0f}, 0.0f, 25.0f);
 
     superSword.specialAttack();
