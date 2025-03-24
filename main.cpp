@@ -179,10 +179,7 @@ class Item {
             std::cout << name << " does not have any special attacks!\n";
     }
 
-    [[nodiscard]]std::string getName() const {
-        return name;
-    }
-
+    [[nodiscard]] const std::string& getName() const {return name;}
 
 };
 
