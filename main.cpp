@@ -44,9 +44,7 @@ public:
         std::cout << "The tree " << name << " is located at " << worldPos[0] << "," << worldPos[1] << "\n";
     }
 
-    [[nodiscard]] const std::string& getName() const {
-        return name;
-    }
+    [[nodiscard]] const std::string& getName() const { return name; }
     ~Prop() = default;
 };
 
