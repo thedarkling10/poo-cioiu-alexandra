@@ -49,7 +49,7 @@ public:
             std::cout << "Invalid position for " << name << "\n";
             return;
         }
-        std::cout << "The tree " << name << " is located at " << worldPos[0] << "," << worldPos[1] << "\n";
+        std::cout << name << " is located at " << worldPos[0] << "," << worldPos[1] << "\n";
     }
 
     [[nodiscard]] const std::string& getName() const { return name; }
@@ -204,10 +204,6 @@ private:
     float health{100.0f};
     bool alive{true};
     Prop weapon;
-
-    int framesSinceLastHeal = 0;
-    const int maximumFrames = 3600;
-
     std::vector<Item> inventory;
 
     std::chrono::steady_clock::time_point lastHealTime;
@@ -238,7 +234,6 @@ public:
             health = other.health;
             alive = other.alive;
             weapon = other.weapon;
-            framesSinceLastHeal = other.framesSinceLastHeal;
         }
         return *this;
     }
@@ -309,9 +304,6 @@ public:
         std::cout << "Character healed by " << amount << ". Current health: " << health << "\n";
     }
 
-    void update() {
-        framesSinceLastHeal++;
-    }
 
     void attack() const {
         std::cout << "Knight attacks with " << weapon.getName() << "!\n";
@@ -382,8 +374,6 @@ public:
         return os;
     }
 
-    [[nodiscard]]bool isDead() const {return health <= 0;}
-
     ~Enemy() = default;
 };
 
@@ -423,13 +413,13 @@ public:
         return os;
     }
 
-    void printPos() const {
+   /* void printPos() const {
         if (position.size() < 2) {
             std::cout << "Invalid position for " << name << "\n";
             return;
         }
         std::cout << name << " is situated at " << position[0] << ", " << position[1] << "\n";
-    }
+    } */
 
     [[nodiscard]] bool reach(float x, float y) const {
         return x >= position[0] && x <= position[0] + width && y >= position[1] && y <= position[1] + height;
@@ -505,14 +495,23 @@ int main() {
                 break;
             case 5:
                 running = false;
-            break;
+                break;
             default:
                 std::cout << "Invalid choice!\n";
-            break;
+                break;
         }
 
         obstacle1.checkDangerZone(knight1);
         obstacle2.checkDangerZone(knight1);
+
+        superSword.upgradeItem(10);
+        superSword2.degradeItem(5);
+
+        superSword.specialAttack();
+        superSword2.specialAttack();
+
+        potion.unequipItem();
+        potion.dropItem(10.0f, 20.0f);
 
         auto frameEnd = std::chrono::steady_clock::now();
         std::chrono::milliseconds frameDuration = std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart);
