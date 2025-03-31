@@ -477,34 +477,9 @@ int main() {
             break;
         }
 
+        std::cout << "\nChoose an action: (1) Attack (2) Move (3) Equip Item (4) Use Potion (5) Quit\n";
         int choice;
-        /*int choice = false;
-        bool pickedExcalibur = false;
-        bool pickedWallace = false;
-
-        if (pickedExcalibur == false)
-            Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f);
-        else {
-            if (choice == 1) {
-                std::cout << "\nChoose an action: (1) Attack (2) Move (3) Equip Item (4) Use Potion (5) Quit\n";
-                std::cin >> choice;
-            }
-            else
-                choice = 3;
-        }
-
-        if (!pickedWallace)
-            Item superSword2("Wallace", {10.0f, 15.0f}, 40.0f, 0.0f);
-        else {
-            if (choice == 1) {
-                std::cout << "\nChoose an action: (1) Attack (2) Move (3) Equip Item (4) Use Potion (5) Quit\n";
-                std::cin >> choice;
-            }
-            else
-                choice = 3;
-        }
-
-*/
+        std::cin >> choice;
 
         switch (choice) {
             case 1:
@@ -521,7 +496,7 @@ int main() {
             case 3:
                 if (superSword.isEquipped()) {
                     knight1.addItemToInventory(superSword);
-                    std::cout << "Equipped " << superSword.getName() << "!\n";
+                    std::cout << "Equipped Excalibur!\n";
                 }
                 break;
             case 4:
@@ -530,10 +505,10 @@ int main() {
                 break;
             case 5:
                 running = false;
-                break;
+            break;
             default:
                 std::cout << "Invalid choice!\n";
-                break;
+            break;
         }
 
         obstacle1.checkDangerZone(knight1);
