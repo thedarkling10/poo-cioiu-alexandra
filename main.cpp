@@ -463,7 +463,7 @@ int main() {
 
         if (knight1.getHealth() <= 0) {
             std::cout << "Game Over!\n";
-            running = false;
+            //running = false;
             break;
         }
 
@@ -484,7 +484,7 @@ int main() {
                 break;
             }
             case 3:
-                if (superSword.isEquipped()) {
+                if (!superSword.isEquipped()) {
                     knight1.addItemToInventory(superSword);
                     std::cout << "Equipped Excalibur!\n";
                 }
@@ -505,6 +505,7 @@ int main() {
         obstacle2.checkDangerZone(knight1);
 
         superSword.upgradeItem(10);
+        superSword.equipItem();
         superSword2.degradeItem(5);
 
         superSword.specialAttack();
