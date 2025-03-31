@@ -2,7 +2,15 @@
 #include <ranges>
 #include <vector>
 #include <string>
+#include <chrono>
+#include <thread>
 
+/* foarte multe items -> citire din fisier
+ e bine de pastrat constructorii acolo unde am frames de este const int
+ in rest sunt cam useless
+ de imbunatatit simularea ( eventual folosind chrono sau asa )
+
+ * */
 class Prop {
 private:
     std::vector<float> worldPos;
@@ -181,6 +189,8 @@ class Item {
 
     [[nodiscard]] const std::string& getName() const {return name;}
 
+    [[nodiscard]] float getHealingAmount() const { return healAmount;}
+
 };
 
 
@@ -200,11 +210,14 @@ private:
 
     std::vector<Item> inventory;
 
+    std::chrono::steady_clock::time_point lastHealTime;
+    const int healIntervalSeconds = 5;
+
 public:
     Character(int winWidth, int winHeight, const Prop& w)
         : windowWidth(winWidth), windowHeight(winHeight),
           screenPos{static_cast<float>(winWidth) / 2, static_cast<float>(winHeight) / 2},
-          weapon(w) {}
+          weapon(w), lastHealTime(std::chrono::steady_clock::now()) {}
 
     Character(const Character& other)
     : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
@@ -258,6 +271,19 @@ public:
         return os;
     }
 
+    void autoHeal() {
+        if (!alive) return;
+
+        auto now = std::chrono::steady_clock::now();
+        auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(now - lastHealTime).count();
+
+        if (elapsedSeconds >= healIntervalSeconds) {
+            heal(10.0f);
+            lastHealTime = now;
+        }
+    }
+
+    [[nodiscard]] float getHealth() const {return health;}
 
     void takeDamage(float damage) {
         health -= damage;
@@ -274,14 +300,6 @@ public:
 
     [[nodiscard]] const std::vector<float>& getPosition() const { return screenPos; };
 
-    void autoHeal() {
-        if (!alive) return;
-
-        if (framesSinceLastHeal >= maximumFrames) {
-            heal(10.0f);
-            framesSinceLastHeal = 0;
-        }
-    }
 
     void heal(float amount) {
         health += amount;
@@ -427,104 +445,104 @@ public:
     ~Obstacle() = default;
 };
 
-
 int main() {
-
-    Prop sword({50.0f, 60.0f}, "Sword");
-    Character knight1{800, 600, sword};
-
-    bool gameRunning = true;
-    int frames = 0;
-
-    while (gameRunning) {
-        frames++;
-        knight1.update();
-        knight1.autoHeal();
-
-        if (frames > 180)
-            gameRunning = false;
-
-        /* simulare -> urmeaza imbunatatiri si functionalitati implementate in tema urmatoare (that will hopefully work) :)*/
-    }
-
-    Character knight2 = knight1;
-    std::cout << knight1 << "\n";
-    std::cout << knight2 << "\n";
-
-    knight1.attack();
-
-    knight1.takeDamage(20);
-    std::cout << knight1 << "\n";
-
-    knight1.move(10, -5);
-    std::cout << knight1 << "\n";
-
-    Prop tree({100.0f, 200.0f}, "Oak");
-    tree.printPos();
-    Prop tree2({25.0f, 35.0f}, "Birch");
-    tree2 = tree;
-    tree2.printPos();
-
-    std::cout << tree << "\n";
-
-    Enemy goblin({300.0f, 400.0f});
-    std::cout << goblin << "\n";
-
-    if (goblin.isDead())
-        std::cout << "Goblin down. Keep the fight going diva!\n";
-
-    goblin.attack(knight1);
-    std::cout << knight1 << "\n";
-
     Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f);
-
-    if (superSword.isEquipped())
-        knight1.addItemToInventory(superSword);
-    std::cout << knight1 << "\n";
-
     Item superSword2("Wallace", {10.0f, 15.0f}, 40.0f, 0.0f);
-    if (superSword2.isEquipped())
-        knight1.addItemToInventory(superSword2);
-    std::cout << knight1 << "\n";
-
+    Prop sword({50.0f, 60.0f}, "Sword");
+    Prop tree({100.0f, 200.0f}, "Oak");
+    Prop tree2({25.0f, 35.0f}, "Birch");
+    Character knight1{800, 600, sword};
+    Enemy goblin({300.0f, 400.0f});
     Item potion("XP", {5.0f, 15.0f}, 0.0f, 25.0f);
-
-    superSword.specialAttack();
-    superSword2.specialAttack();
-
-    superSword.upgradeItem(10);
-    superSword.degradeItem(5);
-
-    std::cout << superSword << "\n";
-    std::cout << potion << "\n";
-
-    Item updatedSword = superSword;
-    potion = superSword;
-
-    std::cout << potion << "\n";
-    std::cout << updatedSword << "\n";
-
-    updatedSword.equipItem();
-    potion.unequipItem();
-    potion.dropItem(10.0f, 20.0f);
-
     Obstacle obstacle1({8.0f, 8.0f}, "Obstacle1");
-
     Obstacle obstacle2({12.0f, 12.0f}, "Obstacle2");
 
-    std::cout << obstacle1 << std::endl;
-    std::cout << obstacle2 << std::endl;
+    bool running = true;
 
-    if (obstacle1.reach(9.0f, 9.0f))
-        std::cout << "The character at point (9, 9) reached " << obstacle1 << std::endl;
-    else
-        std::cout << "The character at point (9, 9) did not reach " << obstacle1 << std::endl;
+    while (running) {
+        auto frameStart = std::chrono::steady_clock::now();
 
-    obstacle1.checkDangerZone(knight1);
-    std::cout << knight1 << "\n";
+        if (knight1.getHealth() > 0) {
+            knight1.takeDamage(1.0f);
+            std::cout << "Character took damage! Health: " << knight1.getHealth() << "\n";
+        }
 
-    knight1.move(9.0f - knight1.getPosition()[0], 9.0f - knight1.getPosition()[1]);
-    obstacle1.checkDangerZone(knight1);
+        knight1.autoHeal();
+
+        goblin.attack(knight1);
+
+        if (knight1.getHealth() <= 0) {
+            std::cout << "Game Over!\n";
+            running = false;
+            break;
+        }
+
+        int choice;
+        /*int choice = false;
+        bool pickedExcalibur = false;
+        bool pickedWallace = false;
+
+        if (pickedExcalibur == false)
+            Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f);
+        else {
+            if (choice == 1) {
+                std::cout << "\nChoose an action: (1) Attack (2) Move (3) Equip Item (4) Use Potion (5) Quit\n";
+                std::cin >> choice;
+            }
+            else
+                choice = 3;
+        }
+
+        if (!pickedWallace)
+            Item superSword2("Wallace", {10.0f, 15.0f}, 40.0f, 0.0f);
+        else {
+            if (choice == 1) {
+                std::cout << "\nChoose an action: (1) Attack (2) Move (3) Equip Item (4) Use Potion (5) Quit\n";
+                std::cin >> choice;
+            }
+            else
+                choice = 3;
+        }
+
+*/
+
+        switch (choice) {
+            case 1:
+                knight1.attack();
+                break;
+            case 2: {
+                float dx, dy;
+                std::cout << "Enter movement (dx dy): ";
+                std::cin >> dx >> dy;
+                knight1.move(dx, dy);
+                std::cout << "New position: " << knight1 << "\n";
+                break;
+            }
+            case 3:
+                if (superSword.isEquipped()) {
+                    knight1.addItemToInventory(superSword);
+                    std::cout << "Equipped " << superSword.getName() << "!\n";
+                }
+                break;
+            case 4:
+                knight1.heal(potion.getHealingAmount());
+                std::cout << "Used potion! Health: " << knight1.getHealth() << "\n";
+                break;
+            case 5:
+                running = false;
+                break;
+            default:
+                std::cout << "Invalid choice!\n";
+                break;
+        }
+
+        obstacle1.checkDangerZone(knight1);
+        obstacle2.checkDangerZone(knight1);
+
+        auto frameEnd = std::chrono::steady_clock::now();
+        std::chrono::milliseconds frameDuration = std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart);
+        std::this_thread::sleep_for(std::chrono::milliseconds(16) - frameDuration);
+    }
 
     return 0;
 }
