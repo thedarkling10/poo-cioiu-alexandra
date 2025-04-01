@@ -4,13 +4,8 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <random>
 
-/* foarte multe items -> citire din fisier
- e bine de pastrat constructorii acolo unde am frames de este const int
- in rest sunt cam useless
- de imbunatatit simularea ( eventual folosind chrono sau asa )
-
- * */
 class Prop {
 private:
     std::vector<float> worldPos;
@@ -437,6 +432,14 @@ public:
     ~Obstacle() = default;
 };
 
+int randomChoice() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<int> distrib(0, 1);
+
+    return distrib(gen);
+}
+
 int main() {
     Item superSword("Excalibur", {10.0f, 20.0f}, 50.0f, 0.0f);
     Item superSword2("Wallace", {10.0f, 15.0f}, 40.0f, 0.0f);
@@ -507,18 +510,18 @@ int main() {
         if (running == false)
             break;
 
-        obstacle1.checkDangerZone(knight1);
-        obstacle2.checkDangerZone(knight1);
+        if (randomChoice()) obstacle1.checkDangerZone(knight1);
+        if (randomChoice()) obstacle2.checkDangerZone(knight1);
 
-        superSword.upgradeItem(10);
-        superSword.equipItem();
-        superSword2.degradeItem(5);
+        if (randomChoice()) superSword.upgradeItem(10);
+        if (randomChoice()) superSword.equipItem();
+        if (randomChoice()) superSword2.degradeItem(5);
 
-        superSword.specialAttack();
-        superSword2.specialAttack();
+        if (randomChoice()) superSword.specialAttack();
+        if (randomChoice()) superSword2.specialAttack();
 
-        potion.unequipItem();
-        potion.dropItem(10.0f, 20.0f);
+        if (randomChoice()) potion.unequipItem();
+        if (randomChoice()) potion.dropItem(10.0f, 20.0f);
 
         auto frameEnd = std::chrono::steady_clock::now();
         std::chrono::milliseconds frameDuration = std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart);
