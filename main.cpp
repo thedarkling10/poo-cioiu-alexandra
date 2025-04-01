@@ -500,8 +500,12 @@ int main() {
                 break;
             default:
                 std::cout << "Invalid choice!\n";
+                running = false;
                 break;
         }
+
+        if (running == false)
+            break;
 
         obstacle1.checkDangerZone(knight1);
         obstacle2.checkDangerZone(knight1);
