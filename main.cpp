@@ -144,18 +144,34 @@ class Item {
 
     void upgradeItem(float percent) {
         if (percent <= 0) {
-            std::cout << "Cannot upgrade item!";
-            return ;
+            std::cout << "Cannot upgrade item!\n";
+            return;
         }
 
         damage += damage * (percent / 100.0f);
         healAmount += healAmount * (percent / 100.0f);
 
-        std::cout << name << " gained an improvement! View stats?(yes/no)";
+        std::cout << name << " gained an improvement! View stats? (yes/no): ";
+
         std::string response;
-        std::cin >> response;
-        if (response == "yes")
-            std::cout << "New stats:\n Damage = " << damage << ", Heal = " << healAmount << "\n";
+        while (true) {
+            std::cin >> response;
+
+            for (char &c : response) {
+                c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+            }
+
+            if (response == "yes") {
+                std::cout << "New stats:\n Damage = " << damage << ", Heal = " << healAmount << "\n";
+                break;
+            } else if (response == "no") {
+                break;
+            } else {
+                std::cout << "Invalid input! Please enter 'yes' or 'no': ";
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
+        }
     }
 
 
