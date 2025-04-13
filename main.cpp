@@ -5,6 +5,7 @@
 #include <chrono>
 #include <thread>
 #include <random>
+#include <tuple>
 
 class Prop {
 private:
@@ -190,12 +191,11 @@ class Item {
 
 };
 
-
 class Character {
 private:
     int windowWidth;
     int windowHeight;
-    std::vector<float> screenPos;
+    std::tuple<float, float> screenPos;  // înlocuit vectorul
     float width{}, height{};
     float scale{4.0f};
     float health{100.0f};
@@ -209,16 +209,14 @@ private:
 public:
     Character(int winWidth, int winHeight, const Prop& w)
         : windowWidth(winWidth), windowHeight(winHeight),
-          screenPos{static_cast<float>(winWidth) / 2, static_cast<float>(winHeight) / 2},
+          screenPos(static_cast<float>(winWidth) / 2, static_cast<float>(winHeight) / 2),
           weapon(w), lastHealTime(std::chrono::steady_clock::now()) {}
 
     Character(const Character& other)
-    : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
-      screenPos(other.screenPos), width(other.width), height(other.height),
-      scale(other.scale), health(other.health), alive(other.alive),
-      weapon(other.weapon) {
-        std::cout << "Constr de copiere Character\n";
-    }
+        : windowWidth(other.windowWidth), windowHeight(other.windowHeight),
+          screenPos(other.screenPos), width(other.width), height(other.height),
+          scale(other.scale), health(other.health), alive(other.alive),
+          weapon(other.weapon), inventory(other.inventory), lastHealTime(other.lastHealTime) {}
 
     Character& operator=(const Character& other) {
         if (this != &other) {
@@ -231,6 +229,8 @@ public:
             health = other.health;
             alive = other.alive;
             weapon = other.weapon;
+            inventory = other.inventory;
+            lastHealTime = other.lastHealTime;
         }
         return *this;
     }
@@ -244,12 +244,10 @@ public:
         os << "health: " << character.health << ", ";
         os << "alive: " << (character.alive ? "Yes" : "No") << ", ";
 
-        os << "screenPos: [";
-        for (size_t i = 0; i < character.screenPos.size(); i++) {
-            os << character.screenPos[i];
-            if (i < character.screenPos.size() - 1) os << ", ";
-        }
-        os << "], weapon: " << character.weapon << "\n";
+        os << "screenPos: (" << std::get<0>(character.screenPos) << ", "
+           << std::get<1>(character.screenPos) << "), ";
+
+        os << "weapon: " << character.weapon << "\n";
 
         os << "Inventory:\n";
         if (character.inventory.empty()) {
@@ -275,7 +273,7 @@ public:
         }
     }
 
-    [[nodiscard]] float getHealth() const {return health;}
+    [[nodiscard]] float getHealth() const { return health; }
 
     void takeDamage(float damage) {
         health -= damage;
@@ -286,11 +284,11 @@ public:
     }
 
     void move(float dx, float dy) {
-        screenPos[0] += dx;
-        screenPos[1] += dy;
+        std::get<0>(screenPos) += dx;
+        std::get<1>(screenPos) += dy;
     }
 
-    [[nodiscard]] const std::vector<float>& getPosition() const { return screenPos; };
+    [[nodiscard]] const std::tuple<float, float>& getPosition() const { return screenPos; }
 
 
     void heal(float amount) {
@@ -301,7 +299,6 @@ public:
         std::cout << "Character healed by " << amount << ". Current health: " << health << "\n";
     }
 
-
     void attack() const {
         std::cout << "Knight attacks with " << weapon.getName() << "!\n";
         weapon.printPos();
@@ -311,9 +308,8 @@ public:
         inventory.push_back(item);
         std::cout << item.getName() << " added to inventory.\n";
     }
-
-
 };
+
 
 class Enemy {
 private:
@@ -423,7 +419,9 @@ public:
     }
 
     void checkDangerZone(Character& character) const {
-        if (reach(character.getPosition()[0], character.getPosition()[1])) {
+        auto [x, y] = character.getPosition();
+        if (reach(x, y))
+        {
             std::cout << "Character approached danger zone of " << name << "!\n";
             character.takeDamage(10.0f);
         }
@@ -457,24 +455,26 @@ int main() {
     while (running) {
         auto frameStart = std::chrono::steady_clock::now();
 
-        if (knight1.getHealth() > 0) {
-            knight1.takeDamage(1.0f);
-            std::cout << "Character took damage! Health: " << knight1.getHealth() << "\n";
+        std::cout << "\nChoose an action: (1) Attack (2) Move (3) Equip Item (4) Use Potion (5) Quit\n";
+        int choice;
+        std::cin >> choice;
+
+
+        if (choice != 3 and choice != 2) {
+            if (knight1.getHealth() > 0) {
+                knight1.takeDamage(1.0f);
+                std::cout << "Character took damage! Health: " << knight1.getHealth() << "\n";
+            }
+            knight1.autoHeal();
+            goblin.attack(knight1);
         }
 
-        knight1.autoHeal();
-
-        goblin.attack(knight1);
 
         if (knight1.getHealth() <= 0) {
             std::cout << "Game Over!\n";
             //running = false;
             break;
         }
-
-        std::cout << "\nChoose an action: (1) Attack (2) Move (3) Equip Item (4) Use Potion (5) Quit\n";
-        int choice;
-        std::cin >> choice;
 
         switch (choice) {
             case 1:
@@ -486,6 +486,14 @@ int main() {
                 std::cin >> dx >> dy;
                 knight1.move(dx, dy);
                 std::cout << "New position: " << knight1 << "\n";
+                if (randomChoice() == 1) {
+                    if (knight1.getHealth() > 0) {
+                        knight1.takeDamage(1.0f);
+                        std::cout << "Character took damage! Health: " << knight1.getHealth() << "\n";
+                    }
+                    knight1.autoHeal();
+                    goblin.attack(knight1);
+                }
                 break;
             }
             case 3:
