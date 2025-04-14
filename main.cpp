@@ -521,7 +521,7 @@ int main() {
         if (randomChoice()) obstacle1.checkDangerZone(knight1);
         if (randomChoice()) obstacle2.checkDangerZone(knight1);
 
-        if (randomChoice()) superSword.upgradeItem(10);
+        if (randomChoice() and choice != 5) superSword.upgradeItem(10);
         if (randomChoice()) superSword.equipItem();
         if (randomChoice()) superSword2.degradeItem(5);
 
