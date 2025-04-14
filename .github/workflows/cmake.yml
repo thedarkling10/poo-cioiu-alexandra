@@ -26,7 +26,7 @@ env:
   INPUT_FILENAME: "tastatura.txt"
   BIN_DIR: "bin"       # update in cmake/Options.cmake:6 if changing name here
   BUILD_DIR: "build"
-  EXT_DIR: "ext"
+  EXT_DIR: "libs"
   GEN_DIR: "generated"
 
 defaults:
