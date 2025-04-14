@@ -5,12 +5,12 @@ Throughout the game, you’ll explore a battlefield filled with obstacles, hidde
 
 Do you have what it takes to defend your land and emerge victorious? The fate of your kingdom rests in your hands! 
 
-Game Flow
+Game Flow:
 
-    The game starts with your knight positioned in the center of the battlefield. 
-    Enemies will attack at regular intervals, dealing damage.
+The game starts with your knight positioned in the center of the battlefield. 
+Enemies will attack at regular intervals, dealing damage.
 
-    You will be presented with a menu of actions, allowing you to:
+You will be presented with a menu of actions, allowing you to:
 
         - Attack(1)
         - Move(2)
@@ -18,10 +18,10 @@ Game Flow
         - Use potions(4)
         - Quit the game(5)
 
-    Random events may occur, such as:
+Random events may occur, such as:
     
         - Items gaining upgrades or degrading over time.
         - Unexpected encounters with obstacles.
         - Enemies launching surprise attacks.
 
-    The game continues until you defeat all enemies or die. Good luck, knight!
+The game continues until you defeat all enemies or die. Good luck, knight!
