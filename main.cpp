@@ -451,6 +451,7 @@ int main() {
     Obstacle obstacle2({12.0f, 12.0f}, "Obstacle2");
 
     bool running = true;
+    int cnt = 0;
 
     while (running) {
         auto frameStart = std::chrono::steady_clock::now();
@@ -458,7 +459,10 @@ int main() {
         std::cout << "\nChoose an action: (1) Attack (2) Move (3) Equip Item (4) Use Potion (5) Quit\n";
         int choice;
         std::cin >> choice;
-
+        if (cnt == 3)
+            cnt = 0;
+        else
+            cnt++;
 
         if (choice != 3 and choice != 2) {
             if (knight1.getHealth() > 0) {
@@ -521,7 +525,7 @@ int main() {
         if (randomChoice()) obstacle1.checkDangerZone(knight1);
         if (randomChoice()) obstacle2.checkDangerZone(knight1);
 
-        if (randomChoice() and choice != 5) superSword.upgradeItem(10);
+        if (cnt == 3 and choice != 5) superSword.upgradeItem(10);
         if (randomChoice()) superSword.equipItem();
         if (randomChoice()) superSword2.degradeItem(5);
 
