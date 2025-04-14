@@ -53,7 +53,7 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         generated/src/Helper.cpp
         Character.cpp
         Character.h
-        libs/termcolor.hpp
+        libs/termcolor/termcolor.hpp
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
@@ -67,7 +67,7 @@ set_compiler_flags(RUN_SANITIZERS TRUE TARGET_NAMES ${MAIN_EXECUTABLE_NAME})
 
 # use SYSTEM so cppcheck and clang-tidy do not report warnings from these directories
 target_include_directories(${MAIN_EXECUTABLE_NAME} SYSTEM PRIVATE generated/include)
-target_include_directories(${MAIN_EXECUTABLE_NAME} SYSTEM PRIVATE libs)
+target_include_directories(${MAIN_EXECUTABLE_NAME} SYSTEM PRIVATE libs/termcolor)
 # target_include_directories(${MAIN_EXECUTABLE_NAME} SYSTEM PRIVATE ext/<SomeHppLib>/include)
 # target_include_directories(${MAIN_EXECUTABLE_NAME} SYSTEM PRIVATE ${<SomeLib>_SOURCE_DIR}/include)
 # target_link_directories(${MAIN_EXECUTABLE_NAME} PRIVATE ${<SomeLib>_BINARY_DIR}/lib)

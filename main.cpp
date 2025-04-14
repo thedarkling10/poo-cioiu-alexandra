@@ -6,7 +6,7 @@
 #include <thread>
 #include <random>
 #include <tuple>
-#include "libs/termcolor.hpp"
+#include "libs/termcolor/termcolor.hpp"
 
 class Prop {
 private:
