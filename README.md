@@ -7,7 +7,8 @@ Do you have what it takes to defend your land and emerge victorious? The fate of
 
 Game Flow:
 
-    The game starts with your knight positioned in the center of the battlefield. Enemies will attack at regular intervals, dealing damage.
+    The game starts with your knight positioned in the center of the battlefield. 
+    Enemies will attack at regular intervals, dealing damage.
 
     You will be presented with a menu of actions, allowing you to:
 
