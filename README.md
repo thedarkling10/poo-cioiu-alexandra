@@ -5,7 +5,7 @@ Throughout the game, you’ll explore a battlefield filled with obstacles, hidde
 
 Do you have what it takes to defend your land and emerge victorious? The fate of your kingdom rests in your hands! 
 
-Game Flow:
+Game Flow
 
     The game starts with your knight positioned in the center of the battlefield. 
     Enemies will attack at regular intervals, dealing damage.
