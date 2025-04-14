@@ -6,6 +6,7 @@
 #include <thread>
 #include <random>
 #include <tuple>
+#include "libs/termcolor.hpp"
 
 class Prop {
 private:
@@ -147,11 +148,11 @@ class Item {
         damage += damage * (percent / 100.0f);
         healAmount += healAmount * (percent / 100.0f);
 
-        std::cout << name << " gained an improvement! View stats?(yes/no)";
+        std::cout << name << " gained an improvement!" << termcolor::green <<  "View stats?(yes/no)" << termcolor::reset;
         std::string response;
         std::cin >> response;
         if (response == "yes")
-            std::cout << "New stats:\n Damage = " << damage << ", Heal = " << healAmount << "\n";
+            std::cout << "New stats:\n" << termcolor::red << " Damage = " << termcolor::reset << damage << termcolor::green << ", Heal = " << termcolor::reset << healAmount << "\n";
         else
             std::cout << "\n";
     }
@@ -165,7 +166,7 @@ class Item {
         damage -= damage * (percent / 100.0f);
         healAmount -= healAmount * (percent / 100.0f);
 
-        std::cout << name << " is wearing out! New stats:\n Damage = " << damage << ", Heal = " << healAmount << "\n";
+        std::cout << name << " is wearing out! New stats:\n " << termcolor::red << "Damage = " << termcolor::reset << damage << termcolor::green << ", Heal = " << termcolor::reset << healAmount << "\n";
     }
 
     void specialAttack() const {
