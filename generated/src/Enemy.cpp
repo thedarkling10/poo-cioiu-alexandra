@@ -20,6 +20,7 @@ void Enemy::update(float deltaTime) {
     // Folosim radius pentru detectarea coliziunilor
     if (checkPlayerInRadius()) {
         // Logică atac când jucătorul e în rază
+        (void) radius;
     }
 }
 

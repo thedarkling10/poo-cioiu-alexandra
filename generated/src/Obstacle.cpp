@@ -9,7 +9,7 @@ std::unique_ptr<GameEntity> Obstacle::clone() const {
 }
 
 void Obstacle::update(float deltaTime) {
-    // Static obstacles typically don't update
+    (void) deltaTime;
 }
 
 void Obstacle::interact(GameEntity& other) {
