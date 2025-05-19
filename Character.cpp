@@ -1,7 +1,5 @@
-#include "../include/Character.h"
-#include "../include/Exceptions.h"
-#include <iostream>
-#include <utility>
+#include "Character.h"
+#include "Exceptions.h"
 
 GameEntity::GameEntity(std::vector<float> pos, std::string n, float s)
     : position(std::move(pos)), name(std::move(n)), scale(s) {}
@@ -160,7 +158,7 @@ const std::tuple<float, float>& Character::getPosition() const {
 
 // Static method
 size_t Character::getMaxInventorySize() {
-    return 10; // Example value
+    return 10;
 }
 
 //std::ostream operator<<(const std::ostream & lhs, const std::unique_ptr<GameEntity>::element_type & rhs);

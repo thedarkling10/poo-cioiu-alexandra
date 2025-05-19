@@ -1,4 +1,4 @@
-#include "../include/Enemy.h"
+#include "Enemy.h"
 
 Enemy::Enemy(std::vector<float> pos)
     : GameEntity(std::move(pos), "Enemy", 1.0f),

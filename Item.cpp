@@ -1,7 +1,7 @@
-#include "../include/Item.h"
+#include "Item.h"
 #include <iostream>
 #include <string>
-#include "../../libs/termcolor/termcolor.hpp"
+#include "libs/termcolor/termcolor.hpp"
 
 Item::Item(std::string n, std::vector<float> pos, float dmg, float heal)
     : GameEntity(std::move(pos), std::move(n), 1.0f),

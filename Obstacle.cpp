@@ -1,4 +1,4 @@
-#include "../include/Obstacle.h"
+#include "Obstacle.h"
 
 Obstacle::Obstacle(std::vector<float> pos, std::string n)
     : GameEntity(std::move(pos), std::move(n), 1.0f),

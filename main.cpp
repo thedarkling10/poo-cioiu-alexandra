@@ -1,20 +1,16 @@
-#include "generated/include/Character.h"
-#include "generated/include/Prop.h"
-#include "generated/include/Item.h"
-#include "generated/include/Enemy.h"
-#include "generated/include/Obstacle.h"
-#include "generated/include/Exceptions.h"
-#include "generated/src/Character.cpp"
-#include "generated/src/Prop.cpp"
-#include "generated/src/Item.cpp"
-#include "generated/src/Enemy.cpp"
-#include "generated/src/Obstacle.cpp"
 #include "libs/termcolor/termcolor.hpp"
 #include <iostream>
 #include <memory>
 #include <chrono>
 #include <thread>
 #include <random>
+#include "GameEntity.h"
+#include "Character.h"
+#include "Prop.h"
+#include "Item.h"
+#include "Enemy.h"
+#include "Obstacle.h"
+#include "Exceptions.h"
 
 // Helper function
 int randomChoice() {

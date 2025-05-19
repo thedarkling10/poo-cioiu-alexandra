@@ -1,4 +1,4 @@
-#include "../include/GameEntity.h"
+#include "GameEntity.h"
 
 GameEntity::GameEntity(std::vector<float> pos, std::string n, float s)
     : position(std::move(pos)), name(std::move(n)), scale(s) {}

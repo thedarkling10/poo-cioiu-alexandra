@@ -1,4 +1,4 @@
-#include "../include/Prop.h"
+#include "Prop.h"
 
 Prop::Prop(std::vector<float> pos, std::string n, float s)
     : GameEntity(std::move(pos), std::move(n), s) {}
