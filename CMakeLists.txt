@@ -51,9 +51,20 @@ include(cmake/CopyHelper.cmake)
 add_executable(${MAIN_EXECUTABLE_NAME}
         main.cpp
         generated/src/Helper.cpp
-        Character.cpp
-        Character.h
+        generated/src/Character.cpp
+        generated/include/Character.h
         libs/termcolor/termcolor.hpp
+        generated/include/GameEntity.h
+        generated/src/GameEntity.cpp
+        generated/src/Prop.cpp
+        generated/include/Prop.h
+        generated/src/Enemy.cpp
+        generated/include/Enemy.h
+        generated/src/Item.cpp
+        generated/include/Item.h
+        generated/src/Obstacle.cpp
+        generated/include/Obstacle.h
+        generated/include/Exceptions.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
