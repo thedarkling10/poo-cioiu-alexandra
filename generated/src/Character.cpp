@@ -159,7 +159,7 @@ const std::tuple<float, float>& Character::getPosition() const {
 }
 
 // Static method
-int Character::getMaxInventorySize() {
+size_t Character::getMaxInventorySize() {
     return 10; // Example value
 }
 

@@ -18,6 +18,9 @@ public:
     
     // Virtual methods
     std::unique_ptr<GameEntity> clone() const override;
+
+    bool checkPlayerInRadius() const;
+
     void update(float deltaTime) override;
     void interact(GameEntity& other) override;
     

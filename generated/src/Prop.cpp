@@ -24,7 +24,7 @@ std::unique_ptr<GameEntity> Prop::clone() const {
 }
 
 void Prop::update(float deltaTime) {
-    // Props typically don't update
+    (void) deltaTime;
 }
 
 void Prop::interact(GameEntity& other) {

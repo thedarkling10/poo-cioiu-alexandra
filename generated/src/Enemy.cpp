@@ -10,13 +10,27 @@ std::unique_ptr<GameEntity> Enemy::clone() const {
 }
 
 void Enemy::update(float deltaTime) {
-    // Enemy AI logic
+    // Exemplu: Folosim speed pentru mișcare
+    position[0] += speed * deltaTime; // Mișcare pe axa X
+
+    if (health <= 0) {
+        alive = false;
+    }
+
+    // Folosim radius pentru detectarea coliziunilor
+    if (checkPlayerInRadius()) {
+        // Logică atac când jucătorul e în rază
+    }
 }
 
 void Enemy::interact(GameEntity& other) {
     if (auto* character = dynamic_cast<Character*>(&other)) {
         attack(*character);
     }
+}
+
+bool Enemy::checkPlayerInRadius() const {
+    return true;
 }
 
 void Enemy::attack(Character& target) const {

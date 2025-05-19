@@ -55,7 +55,7 @@ public:
     const std::tuple<float, float>& getPosition() const;
     
     // Static method
-    static int getMaxInventorySize();
+    static size_t getMaxInventorySize();
 
     // Friend operator
     friend std::ostream& operator<<(std::ostream& os, const Character& character);
