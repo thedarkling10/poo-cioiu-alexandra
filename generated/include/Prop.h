@@ -2,8 +2,6 @@
 #define PROP_H
 
 #include "GameEntity.h"
-#include <iostream>
-#include <utility>
 
 class Prop : public GameEntity {
 public:

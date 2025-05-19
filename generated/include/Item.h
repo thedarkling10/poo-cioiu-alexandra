@@ -3,8 +3,6 @@
 
 #include "GameEntity.h"
 #include <string>
-#include <iostream>
-#include <C:\Users\cioiu\Documents\GitHub\poo-cioiu-alexandra\libs\termcolor\termcolor.hpp>
 
 class Item : public GameEntity {
 private:
