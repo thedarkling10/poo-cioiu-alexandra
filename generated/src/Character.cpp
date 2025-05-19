@@ -85,8 +85,9 @@ std::unique_ptr<GameEntity> Character::clone() const {
     return std::make_unique<Character>(*this);
 }
 
-// Virtual methods from GameEntity
+// Virtual methods from  GameEntity
 void Character::update(float deltaTime) {
+    (void) deltaTime;
     autoHeal();
 }
 

@@ -25,7 +25,7 @@ std::unique_ptr<GameEntity> Item::clone() const {
 
 void Item::update(float deltaTime) {
     // Items could degrade over time
-    degradeItem(0.1f);
+    degradeItem(0.1f * deltaTime);
 }
 
 void Item::interact(GameEntity& other) {
