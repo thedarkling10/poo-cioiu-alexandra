@@ -96,7 +96,8 @@ void Character::interact(GameEntity& other) {
             addItemToInventory(*item);
             std::cout << "Picked up: " << item->getName() << std::endl;
         } catch (const InventoryFullException& e) {
-            std::cout << "Inventory full! Can't pick up " << item->getName() << std::endl;
+            std::cout << "Inventory full! Can't pick up " << item->getName()
+                      << " (" << e.what() << ")" << std::endl;
         }
     }
 
