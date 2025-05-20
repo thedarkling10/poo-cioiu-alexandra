@@ -20,6 +20,20 @@ int randomChoice() {
     return distrib(gen);
 }
 
+bool areClose(const GameEntity& a, const GameEntity& b) {
+    const std::vector<float>& posA = a.getPosition();
+    const std::vector<float>& posB = b.getPosition();
+
+    if (posA.size() < 2 || posB.size() < 2) {
+        return false;
+    }
+    float threshold = 10.0f * (a.getScale() + b.getScale());
+
+    float dx = posA[0] - posB[0]; // x coordinate
+    float dy = posA[1] - posB[1]; // y coordinate
+    return (dx*dx + dy*dy) < (threshold * threshold); // 10 units distance squared
+}
+
 int main() {
     try {
         // Initialize game entities using smart pointers
@@ -75,6 +89,14 @@ int main() {
                     std::cin >> dx >> dy;
                     knight.move(dx, dy);
                     std::cout << "New position: " << knight << "\n";
+                    knight.update(0.016f);
+
+                    //std::cout << "Attacking...\n";
+
+                    if (areClose(knight, *superSword)) {
+                        std::cout << areClose(knight, *superSword) << "\n";
+                        knight.interact(*superSword);
+                    }
 
                     // Random encounter chance
                     if (randomChoice() == 1) {

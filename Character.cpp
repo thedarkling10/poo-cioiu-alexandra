@@ -90,10 +90,16 @@ void Character::update(float deltaTime) {
 }
 
 void Character::interact(GameEntity& other) {
-    // Example interaction logic
+    // Simple interaction with items
     if (auto* item = dynamic_cast<Item*>(&other)) {
-        addItemToInventory(*item);
+        try {
+            addItemToInventory(*item);
+            std::cout << "Picked up: " << item->getName() << std::endl;
+        } catch (const InventoryFullException& e) {
+            std::cout << "Inventory full! Can't pick up " << item->getName() << std::endl;
+        }
     }
+
 }
 
 // Character-specific methods
