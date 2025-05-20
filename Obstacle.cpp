@@ -24,7 +24,7 @@ bool Obstacle::reach(float x, float y) const {
 }
 
 void Obstacle::checkDangerZone(Character& character) const {
-    auto [x, y] = character.getPosition();
+    auto [x, y] = character.getScreenPosition();
     if (reach(x, y)) {
         std::cout << "Character in danger zone of " << name << "!\n";
         character.takeDamage(10.0f);

@@ -20,12 +20,12 @@ public:
     virtual std::unique_ptr<GameEntity> clone() const = 0;
     virtual void update(float deltaTime) = 0;
     virtual void interact(GameEntity& other) = 0;
+    virtual const std::vector<float>& getPosition() const { return position; }
 
     // Common functionality
     virtual void printPosition() const;
 
     // Getters
-    const std::vector<float>& getPosition() const { return position; }
     const std::string& getName() const { return name; }
     float getScale() const { return scale; }
 

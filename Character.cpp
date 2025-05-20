@@ -159,7 +159,12 @@ float Character::getHealth() const {
     return health;
 }
 
-const std::tuple<float, float>& Character::getPosition() const {
+const std::vector<float>& Character::getPosition() const {
+    static std::vector<float> vPos{std::get<0>(screenPos), std::get<1>(screenPos)};
+    return vPos;
+}
+
+const std::tuple<float, float>& Character::getScreenPosition() const {
     return screenPos;
 }
 

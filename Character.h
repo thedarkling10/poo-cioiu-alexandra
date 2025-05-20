@@ -52,8 +52,9 @@ public:
 
     // Getters
     float getHealth() const;
-    const std::tuple<float, float>& getPosition() const;
-    
+    const std::vector<float>& getPosition() const override;
+    const std::tuple<float, float>& getScreenPosition() const;
+
     // Static method
     static size_t getMaxInventorySize();
 
