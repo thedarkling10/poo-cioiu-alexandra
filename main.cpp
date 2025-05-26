@@ -129,7 +129,9 @@ int main() {
                             try {
                                 auto giftedPotion = std::make_unique<Item>("Health Potion", player.getPosition(), 0.0f, 25.0f);
                                 player.interact(*giftedPotion);
-                                std::cout << "You received a Health Potion from the merchant!\n";
+                                std::cout << "You received a Health Potion from the merchant that restores "
+          << giftedPotion->getHealingAmount() << " HP!\n";
+
                             } catch (const InventoryFullException&) {
                                 std::cout << "Your inventory is full. Merchant frowns and puts the potion away.\n";
                             }

@@ -57,7 +57,7 @@ void Character::update(float deltaTime) {
 void Character::interact(GameEntity& other) {
     if (auto* item = dynamic_cast<Item*>(&other)) {
         if (inventory.size() >= getMaxInventorySize()) {
-            inventory.erase(inventory.begin());
+            removeOldestItem();
         }
         inventory.push_back(std::unique_ptr<GameEntity>(item->clone()));
     }

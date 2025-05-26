@@ -24,7 +24,11 @@ void Enemy::interact(GameEntity& other) {
 }
 
 void Enemy::attack(Character& target) const {
-    if (alive) {
+    float dx = target.getPosition()[0] - position[0];
+    float dy = target.getPosition()[1] - position[1];
+    float distanceSquared = dx * dx + dy * dy;
+
+    if (alive && distanceSquared <= radius * radius) {
         target.takeDamage(damagePerSec);
     }
 }
