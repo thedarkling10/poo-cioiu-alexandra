@@ -22,7 +22,7 @@ public:
     Character(const Character& other);
     Character(Character&& other) noexcept;
     Character& operator=(Character other);
-    ~Character() override = default;
+    //~Character() override = default;
 
     [[nodiscard]] std::unique_ptr<GameEntity> clone() const override;
     void update(float deltaTime) override;

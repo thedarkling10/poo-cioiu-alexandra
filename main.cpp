@@ -78,7 +78,7 @@ int main() {
                     if (areClose(player, *excalibur)) {
                         std::cout << termcolor::magenta << "You discovered the legendary Excalibur!\n" << termcolor::reset;
                         player.interact(*excalibur);
-                        excalibur.reset(); // consumat
+                        excalibur.reset();
                     }
 
                     if (healthPotion && areClose(player, *healthPotion)) {
