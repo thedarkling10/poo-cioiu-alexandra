@@ -78,6 +78,13 @@ void Character::move(float dx, float dy) {
     std::get<1>(screenPos) += dy;
 }
 
+void Character::addItem(std::unique_ptr<GameEntity> item) {
+    if (inventory.size() >= getMaxInventorySize()) {
+        removeOldestItem();
+    }
+    inventory.push_back(std::move(item));
+}
+
 void Character::attack() const {
     if (weapon) {
         const_cast<GameEntity*>(weapon.get())->interact(const_cast<Character&>(*this));
