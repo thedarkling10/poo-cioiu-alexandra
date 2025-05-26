@@ -65,11 +65,10 @@ void Character::removeOldestItem() {
 }
 
 void Character::interact(GameEntity& other) {
-    if (auto* const item = dynamic_cast<Item*>(&other)) {
+    if (const auto* const item = dynamic_cast<const Item*>(&other)) {
         if (inventory.size() >= getMaxInventorySize()) {
             removeOldestItem();
         }
-        // Only add Items to inventory to prevent infinite recursion
         inventory.push_back(std::unique_ptr<GameEntity>(item->clone()));
     }
 }
