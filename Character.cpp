@@ -57,7 +57,7 @@ void Character::update(float deltaTime) {
 void Character::interact(GameEntity& other) {
     if (auto* item = dynamic_cast<Item*>(&other)) {
         if (inventory.size() >= getMaxInventorySize()) {
-            throw InventoryFullException("Cannot add more items");
+            inventory.erase(inventory.begin());
         }
         inventory.push_back(std::unique_ptr<GameEntity>(item->clone()));
     }

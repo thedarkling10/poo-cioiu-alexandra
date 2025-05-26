@@ -49,7 +49,7 @@ int main() {
 
         std::cout << termcolor::cyan << "Welcome to the Adventure Game!\n" << termcolor::reset;
 
-        while (gameRunning && player.isAlive()) {
+        while (gameRunning && player.isAlive() && turnCount < 1000) {
             std::cout << termcolor::bold << "\n=== Turn " << ++turnCount << " ===\n" << termcolor::reset;
             std::cout << player << "\n";
 
@@ -130,7 +130,7 @@ int main() {
                                 auto giftedPotion = std::make_unique<Item>("Health Potion", player.getPosition(), 0.0f, 25.0f);
                                 player.interact(*giftedPotion);
                                 std::cout << "You received a Health Potion from the merchant!\n";
-                            } catch (const InventoryFullException& e) {
+                            } catch (const InventoryFullException&) {
                                 std::cout << "Your inventory is full. Merchant frowns and puts the potion away.\n";
                             }
                         } else {

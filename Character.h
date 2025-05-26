@@ -17,6 +17,7 @@ private:
     void swap(Character& other) noexcept;
 
 public:
+
     Character(int winWidth, int winHeight, std::unique_ptr<GameEntity> w);
 
     Character(const Character& other);
@@ -27,6 +28,12 @@ public:
     [[nodiscard]] std::unique_ptr<GameEntity> clone() const override;
     void update(float deltaTime) override;
     void interact(GameEntity& other) override;
+
+    void removeOldestItem() {
+        if (!inventory.empty()) {
+            inventory.erase(inventory.begin());
+        }
+    }
 
     void autoHeal();
     void move(float dx, float dy);
