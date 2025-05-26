@@ -18,8 +18,6 @@ Character::Character(const Character& other)
       lastHealTime(other.lastHealTime) {
     inventory.reserve(other.inventory.size());
     for (const auto& item : other.inventory) {
-        // Only clone if it's actually an Item to prevent infinite recursion
-        // This prevents Characters being stored in inventory which could cause stack overflow
         if (dynamic_cast<const Item*>(item.get())) {
             inventory.push_back(item->clone());
         }
@@ -64,7 +62,6 @@ void Character::interact(GameEntity& other) {
         if (inventory.size() >= getMaxInventorySize()) {
             removeOldestItem();
         }
-        // Only add Items to inventory to prevent infinite recursion
         inventory.push_back(std::unique_ptr<GameEntity>(item->clone()));
     }
 }
