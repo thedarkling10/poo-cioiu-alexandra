@@ -61,7 +61,7 @@ void Character::removeOldestItem() {
 }
 
 void Character::interact(GameEntity& other) {
-    if (auto* item = dynamic_cast<Item*>(&other)) {
+    if (auto* const item = dynamic_cast<Item*>(&other)) {
         if (inventory.size() >= getMaxInventorySize()) {
             removeOldestItem();
         }
