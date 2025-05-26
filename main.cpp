@@ -128,10 +128,11 @@ int main() {
                         if (response == 'y' || response == 'Y') {
                             try {
                                 auto giftedPotion = std::make_unique<Item>("Health Potion", player.getPosition(), 0.0f, 25.0f);
+                                float healAmount = giftedPotion->getHealingAmount(); // Store healing amount before moving
                                 player.addItem(std::move(giftedPotion));
                                 player.heal(25.0f);
                                 std::cout << "You received a Health Potion from the merchant that restores "
-          << giftedPotion->getHealingAmount() << " HP!\n";
+                                          << healAmount << " HP!\n";
 
                             } catch (const InventoryFullException&) {
                                 std::cout << "Your inventory is full. Merchant frowns and puts the potion away.\n";

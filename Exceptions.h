@@ -1,3 +1,6 @@
+#ifndef EXCEPTIONS_H
+#define EXCEPTIONS_H
+
 #include <stdexcept>
 #include <string>
 
@@ -23,3 +26,5 @@ public:
     explicit DeadEntityException(const std::string& msg)
         : GameException("Entity is dead: " + msg) {}
 };
+
+#endif // EXCEPTIONS_H
