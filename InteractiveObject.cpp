@@ -10,5 +10,6 @@ void InteractiveObject::update(float deltaTime) {
 void InteractiveObject::interact(GameEntity& other) {
     if (interactable) {
         onUse(other);
+        setInteractable(false);
     }
 }

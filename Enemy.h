@@ -11,9 +11,9 @@ private:
     float radius;
 
 public:
-    Enemy(std::vector<float> pos);
+    explicit Enemy(std::vector<float> pos);
 
-    std::unique_ptr<GameEntity> clone() const override;
+    [[nodiscard]] std::unique_ptr<GameEntity> clone() const override;
     void update(float deltaTime) override;
     void interact(GameEntity& other) override;
     void attack(Character& target) const;

@@ -90,7 +90,8 @@ size_t Character::getMaxInventorySize() {
 
 void Character::print(std::ostream& os) const {
     GameEntity::print(os);
-    os << " Position: (" << std::get<0>(screenPos) << ", " << std::get<1>(screenPos) << ")";
+    auto [x, y] = getScreenPosition();
+    os << " ScreenPos: (" << x << ", " << y << ")";
     if (weapon) {
         os << " Weapon: " << *weapon;
     }

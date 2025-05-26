@@ -10,10 +10,12 @@ std::unique_ptr<GameEntity> Enemy::clone() const {
 
 void Enemy::update(float deltaTime) {
     position[0] += speed * deltaTime;
+    printPosition();
     if (health <= 0) {
         alive = false;
     }
 }
+
 
 void Enemy::interact(GameEntity& other) {
     if (auto* character = dynamic_cast<Character*>(&other)) {
@@ -30,4 +32,5 @@ void Enemy::attack(Character& target) const {
 void Enemy::print(std::ostream& os) const {
     GameEntity::print(os);
     os << " Speed: " << speed << " Damage: " << damagePerSec;
+    os << " Scale: " << getScale() << " HP: " << getHealth();
 }
