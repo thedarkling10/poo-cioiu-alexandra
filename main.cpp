@@ -49,7 +49,7 @@ int main() {
 
         std::cout << termcolor::cyan << "Welcome to the Adventure Game!\n" << termcolor::reset;
 
-        while (gameRunning && player.isAlive() && turnCount < 1000) {
+        while (gameRunning && player.isAlive()) {
             std::cout << termcolor::bold << "\n=== Turn " << ++turnCount << " ===\n" << termcolor::reset;
             std::cout << player << "\n";
 
@@ -58,7 +58,10 @@ int main() {
                       << "Choose: ";
 
             int choice;
-            std::cin >> choice;
+            if (turnCount >= 500)
+                choice = 5;
+            else
+                std::cin >> choice;
 
             switch (choice) {
                 case 1: { // Move
