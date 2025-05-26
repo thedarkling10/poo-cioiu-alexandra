@@ -9,7 +9,7 @@ std::unique_ptr<GameEntity> Obstacle::clone() const {
 }
 
 void Obstacle::update(float deltaTime) {
-    (void) deltaTime;
+    (void)deltaTime;
 }
 
 void Obstacle::interact(GameEntity& other) {
@@ -24,8 +24,8 @@ bool Obstacle::reach(float x, float y) const {
 }
 
 void Obstacle::checkDangerZone(Character& character) const {
-    auto [x, y] = character.getScreenPosition();
-    if (reach(x, y)) {
+    auto pos = character.getPosition();
+    if (pos.size() >= 2 && reach(pos[0], pos[1])) {
         std::cout << "Character in danger zone of " << name << "!\n";
         character.takeDamage(10.0f);
     }

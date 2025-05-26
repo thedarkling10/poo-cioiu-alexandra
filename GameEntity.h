@@ -11,24 +11,32 @@ protected:
     std::vector<float> position;
     std::string name;
     float scale;
+    float health;
+    bool alive;
 
 public:
-    GameEntity(std::vector<float> pos, std::string n, float s = 1.0f);
-    virtual ~GameEntity() = default;
+    GameEntity(std::vector<float> pos, std::string n, float s = 1.0f, float h = 100.0f);
+    virtual ~GameEntity() = default; // fct virtuala pura
 
-    // Virtual methods
-    virtual std::unique_ptr<GameEntity> clone() const = 0;
-    virtual void update(float deltaTime) = 0;
-    virtual void interact(GameEntity& other) = 0;
-    virtual const std::vector<float>& getPosition() const { return position; }
+    // Pure virtual functions (clone is virtual constructor)
+    virtual std::unique_ptr<GameEntity> clone() const = 0;  // Virtual constructor
+    virtual void update(float deltaTime) = 0;               // Game-specific virtual function
+    virtual void interact(GameEntity& other) = 0;           // Game-specific virtual function
 
-    // Common functionality
-    virtual void printPosition() const;
+    // Functionalitati
+    virtual void takeDamage(float damage);
+    virtual void heal(float amount);
+    void printPosition() const;
+    bool isAlive() const { return alive; }
 
-    // Getters
+    // Const getters
+    const std::vector<float>& getPosition() const { return position; }
     const std::string& getName() const { return name; }
     float getScale() const { return scale; }
+    float getHealth() const { return health; }
 
+    // op virtual
+    virtual void print(std::ostream& os) const;
     friend std::ostream& operator<<(std::ostream& os, const GameEntity& entity);
 };
 

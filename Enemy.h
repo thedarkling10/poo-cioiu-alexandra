@@ -3,29 +3,23 @@
 
 #include "GameEntity.h"
 #include "Character.h"
-#include <vector>
 
 class Enemy : public GameEntity {
 private:
     float speed;
-    float health;
-    bool alive;
     float damagePerSec;
     float radius;
 
 public:
-    explicit Enemy(std::vector<float> pos);
-    
-    // Virtual methods
+    Enemy(std::vector<float> pos);
+
     std::unique_ptr<GameEntity> clone() const override;
-
-    bool checkPlayerInRadius() const;
-
     void update(float deltaTime) override;
     void interact(GameEntity& other) override;
-    
-    // Enemy-specific methods
     void attack(Character& target) const;
+
+protected:
+    void print(std::ostream& os) const override;
 };
 
 #endif // ENEMY_H

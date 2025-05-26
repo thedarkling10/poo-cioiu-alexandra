@@ -36,6 +36,10 @@ set(PROJECT_SOURCES
         Item.cpp
         Prop.cpp
         Obstacle.cpp
+        InteractiveObject.cpp
+        InteractiveObject.h
+        NPC.cpp
+        NPC.h
 )
 
 # Add executable target

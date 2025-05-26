@@ -6,162 +6,187 @@
 #include <random>
 #include "GameEntity.h"
 #include "Character.h"
-#include "Prop.h"
 #include "Item.h"
 #include "Enemy.h"
-#include "Obstacle.h"
+#include "NPC.h"
 #include "Exceptions.h"
 
-// Helper function
-int randomChoice() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_int_distribution<int> distrib(0, 1);
-    return distrib(gen);
+bool areClose(const GameEntity& a, const GameEntity& b) {
+    const auto& posA = a.getPosition();
+    const auto& posB = b.getPosition();
+
+    if (posA.size() < 2 || posB.size() < 2) return false;
+
+    constexpr float threshold = 50.0f;
+    const float dx = posA[0] - posB[0];
+    const float dy = posA[1] - posB[1];
+
+    return (dx*dx + dy*dy) <= (threshold * threshold);
 }
 
-bool areClose(const GameEntity& a, const GameEntity& b) {
-    const std::vector<float>& posA = a.getPosition();
-    const std::vector<float>& posB = b.getPosition();
-
-    if (posA.size() < 2 || posB.size() < 2) {
-        return false;
-    }
-    float threshold = 10.0f * (a.getScale() + b.getScale());
-
-    float dx = posA[0] - posB[0]; // x coordinate
-    float dy = posA[1] - posB[1]; // y coordinate
-    return (dx*dx + dy*dy) < (threshold * threshold); // 10 units distance squared
+int randomChance(int min = 0, int max = 1) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(min, max);
+    return distrib(gen);
 }
 
 int main() {
     try {
-        // Initialize game entities using smart pointers
-        auto superSword = std::make_unique<Item>("Excalibur", std::vector<float>{10.0f, 20.0f}, 50.0f, 0.0f);
-        auto superSword2 = std::make_unique<Item>("Wallace", std::vector<float>{10.0f, 15.0f}, 40.0f, 0.0f);
-        auto swordProp = std::make_unique<Prop>(std::vector<float>{50.0f, 60.0f}, "Sword");
+        // === Inițializare atribute din joc ===
+        auto excalibur = std::make_unique<Item>("Excalibur", std::vector<float>{10.0f, 20.0f}, 50.0f, 0.0f);
+        auto healthPotion = std::make_unique<Item>("Health Potion", std::vector<float>{15.0f, 25.0f}, 0.0f, 25.0f);
 
-        // Create character with weapon
-        Character knight(800, 600, std::move(swordProp));
+        Character player(800, 600, std::make_unique<Item>("Basic Sword", std::vector<float>{0.0f, 0.0f}, 10.0f, 0.0f));
 
-        // Create enemies and obstacles
         Enemy goblin({300.0f, 400.0f});
-        auto potion = std::make_unique<Item>("XP", std::vector<float>{5.0f, 15.0f}, 0.0f, 25.0f);
-        Obstacle obstacle1({8.0f, 8.0f}, "Obstacle1");
-        Obstacle obstacle2({12.0f, 12.0f}, "Obstacle2");
+        Enemy orc({200.0f, 300.0f});
 
-        bool running = true;
-        int cnt = 0;
+        NPC merchant({100.0f, 100.0f}, "Merchant", "Welcome traveler! Buy my wares!");
 
-        while (running) {
-            auto frameStart = std::chrono::steady_clock::now();
+        bool gameRunning = true;
+        int turnCount = 0;
 
-            std::cout << "\nChoose an action: (1) Attack (2) Move (3) Equip Item (4) Use Potion (5) Quit\n";
+        std::cout << termcolor::cyan << "Welcome to the Adventure Game!\n" << termcolor::reset;
+
+        while (gameRunning && player.isAlive()) {
+            std::cout << termcolor::bold << "\n=== Turn " << ++turnCount << " ===\n" << termcolor::reset;
+            std::cout << player << "\n";
+
+            std::cout << "\nActions:\n"
+                      << "1. Move\n2. Attack\n3. Use Item\n4. Talk to NPC\n5. Quit\n"
+                      << "Choose: ";
+
             int choice;
             std::cin >> choice;
 
-            if (cnt == 3) cnt = 0;
-            else cnt++;
-
-            // Random damage unless moving or equipping
-            if (choice != 3 && choice != 2) {
-                if (knight.getHealth() > 0) {
-                    knight.takeDamage(1.0f);
-                    std::cout << "Character took damage! Health: " << knight.getHealth() << "\n";
-                }
-                knight.autoHeal();
-                goblin.attack(knight);
-            }
-
-            // Game over check
-            if (knight.getHealth() <= 0) {
-                std::cout << "Game Over!\n";
-                break;
-            }
-
             switch (choice) {
-                case 1:
-                    knight.attack();
-                    break;
-                case 2: {
+                case 1: { // Move
                     float dx, dy;
-                    std::cout << "Enter movement (dx dy): ";
+                    std::cout << "Enter direction (x y): ";
                     std::cin >> dx >> dy;
-                    knight.move(dx, dy);
-                    std::cout << "New position: " << knight << "\n";
-                    knight.update(0.016f);
+                    player.move(dx, dy);
 
-                    //std::cout << "Attacking...\n";
-
-                    if (areClose(knight, *superSword)) {
-                        std::cout << areClose(knight, *superSword) << "\n";
-                        knight.interact(*superSword);
+                    if (randomChance() == 1) {
+                        std::cout << termcolor::yellow << "A wild enemy appears and slashes you!\n" << termcolor::reset;
+                        player.takeDamage(5.0f);
                     }
 
-                    // Random encounter chance
-                    if (randomChoice() == 1) {
-                        knight.takeDamage(1.0f);
-                        std::cout << "Random encounter! Health: " << knight.getHealth() << "\n";
-                        knight.autoHeal();
-                        goblin.attack(knight);
+                    if (areClose(player, *excalibur)) {
+                        std::cout << termcolor::magenta << "You discovered the legendary Excalibur!\n" << termcolor::reset;
+                        player.interact(*excalibur);
+                        excalibur.reset(); // consumat
+                    }
+
+                    if (healthPotion && areClose(player, *healthPotion)) {
+                        std::cout << termcolor::green << "You found a health potion on the ground.\n" << termcolor::reset;
+                        player.interact(*healthPotion);
+                        healthPotion.reset();
+                    }
+
+                    if (areClose(player, merchant)) {
+                        std::cout << termcolor::blue << "You see a mysterious figure nearby... It's the "
+                                  << merchant.getName() << "!\n"
+                                  << "He looks like he has something to offer.\n" << termcolor::reset;
                     }
                     break;
                 }
-                case 3:
-                    if (!superSword->isEquipped()) {
-                        knight.addItemToInventory(*superSword);
-                        std::cout << "Equipped Excalibur!\n";
+
+                case 2: // Attack
+                    std::cout << "You swing your weapon in front of you...\n";
+                    player.attack();
+
+                    if (areClose(player, goblin)) {
+                        std::cout << "A goblin jumps in to fight!\n";
+                        goblin.interact(player);
+                    }
+
+                    if (areClose(player, orc)) {
+                        std::cout << "An orc growls and charges at you!\n";
+                        orc.interact(player);
                     }
                     break;
-                case 4:
-                    knight.heal(potion->getHealingAmount());
-                    std::cout << "Used potion! Health: " << knight.getHealth() << "\n";
+
+                case 3: // Use Item
+                    if (healthPotion && areClose(player, *healthPotion)) {
+                        std::cout << "You reach out for the health potion...\n";
+                        player.interact(*healthPotion);
+                        healthPotion.reset();
+                    } else {
+                        std::cout << "There are no usable items nearby.\n";
+                    }
                     break;
-                case 5:
-                    running = false;
+
+                case 4: // Talk to NPC
+                    if (areClose(player, merchant)) {
+                        merchant.interact(player);
+
+                        // Dialog:
+                        std::cout << "Merchant: I can offer you a Health Potion for free, would you like to take it? (y/n): ";
+                        char response;
+                        std::cin >> response;
+                        if (response == 'y' || response == 'Y') {
+                            try {
+                                auto giftedPotion = std::make_unique<Item>("Health Potion", player.getPosition(), 0.0f, 25.0f);
+                                player.interact(*giftedPotion);
+                                std::cout << "You received a Health Potion from the merchant!\n";
+                            } catch (const InventoryFullException& e) {
+                                std::cout << "Your inventory is full. Merchant frowns and puts the potion away.\n";
+                            }
+                        } else {
+                            std::cout << "Merchant: Very well, maybe next time.\n";
+                        }
+
+                    } else {
+                        std::cout << termcolor::dark << "There are no NPCs nearby to talk to.\n" << termcolor::reset;
+                    }
                     break;
+
+                case 5: // Quit
+                    std::cout << "You chose to end your journey. Goodbye!\n";
+                    gameRunning = false;
+                    break;
+
                 default:
-                    std::cout << "Invalid choice!\n";
-                    running = false;
-                    break;
+                    std::cout << "Invalid choice. Please select between 1-5.\n";
             }
 
-            if (!running) break;
+            // === Enemy actiuni===
+            if (player.isAlive()) {
+                goblin.update(0.1f);
+                orc.update(0.1f);
+                player.update(0.1f);
 
-            // Random obstacle interactions
-            if (randomChoice()) obstacle1.checkDangerZone(knight);
-            if (randomChoice()) obstacle2.checkDangerZone(knight);
+                // Uneori apare o poțiune
+                if (randomChance() == 1 && !healthPotion) {
+                    healthPotion = std::make_unique<Item>(
+                        "Health Potion",
+                        std::vector<float>{
+                        player.getPosition()[0] + static_cast<float>(randomChance(-20, 20)),
+                        player.getPosition()[1] + static_cast<float>(randomChance(-20, 20))
+},
+                        0.0f, 25.0f);
+                    std::cout << termcolor::green << "A shimmering potion materializes nearby!\n" << termcolor::reset;
+                }
+            }
 
-            // Periodic upgrades/degradations
-            if (cnt == 3 && choice != 5) superSword->upgradeItem(10);
-            if (randomChoice()) superSword->equipItem();
-            if (randomChoice()) superSword2->degradeItem(5);
+            if (!player.isAlive()) {
+                std::cout << termcolor::red << "\nGAME OVER! You have perished on your journey.\n" << termcolor::reset;
+            }
 
-            // Special attacks
-            if (randomChoice()) superSword->specialAttack();
-            if (randomChoice()) superSword2->specialAttack();
-
-            // Item management
-            if (randomChoice()) potion->unequipItem();
-            if (randomChoice()) potion->dropItem(10.0f, 20.0f);
-
-            // Frame rate control
-            auto frameEnd = std::chrono::steady_clock::now();
-            auto frameDuration = std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart);
-            std::this_thread::sleep_for(std::chrono::milliseconds(16) - frameDuration);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
-    }
-    catch (const InvalidPositionException& e) {
-        std::cerr << termcolor::red << "Position error: " << e.what() << termcolor::reset << std::endl;
+
+        std::cout << termcolor::cyan << "Thanks for playing this tiny adventure!\n" << termcolor::reset;
     }
     catch (const InventoryFullException& e) {
-        std::cerr << termcolor::red << "Inventory error: " << e.what() << termcolor::reset << std::endl;
+        std::cerr << termcolor::red << "Inventory Error: " << e.what() << termcolor::reset << "\n";
     }
     catch (const DeadEntityException& e) {
-        std::cerr << termcolor::red << "Entity error: " << e.what() << termcolor::reset << std::endl;
+        std::cerr << termcolor::red << "Fatal Error: " << e.what() << termcolor::reset << "\n";
     }
     catch (const std::exception& e) {
-        std::cerr << termcolor::red << "Unexpected error: " << e.what() << termcolor::reset << std::endl;
+        std::cerr << termcolor::red << "Unexpected Error: " << e.what() << termcolor::reset << "\n";
     }
 
     return 0;
