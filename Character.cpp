@@ -54,6 +54,12 @@ void Character::update(float deltaTime) {
     autoHeal();
 }
 
+void Character::removeOldestItem() {
+    if (!inventory.empty()) {
+        inventory.erase(inventory.begin());
+    }
+}
+
 void Character::interact(GameEntity& other) {
     if (auto* item = dynamic_cast<Item*>(&other)) {
         if (inventory.size() >= getMaxInventorySize()) {
