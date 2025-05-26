@@ -8,14 +8,24 @@ const int Character::healIntervalSeconds = 5;
 Character::Character(int winWidth, int winHeight, std::unique_ptr<GameEntity> w)
     : GameEntity({}, "Character", 4.0f),
       screenPos(winWidth/2.0f, winHeight/2.0f),
-      weapon(std::move(w)),
-      lastHealTime(std::chrono::steady_clock::now()) {}
+      weapon(nullptr),  // Initialize to nullptr first
+      lastHealTime(std::chrono::steady_clock::now()) {
+    // Only assign weapon if it's actually an Item to prevent recursion
+    if (w && dynamic_cast<Item*>(w.get())) {
+        weapon = std::move(w);
+    }
+}
 
 Character::Character(const Character& other)
     : GameEntity(other),
       screenPos(other.screenPos),
-      weapon(other.weapon ? other.weapon->clone() : nullptr),
+      weapon(nullptr), // Initialize to nullptr first
       lastHealTime(other.lastHealTime) {
+    // Only clone weapon if it's actually an Item to prevent infinite recursion
+    if (other.weapon && dynamic_cast<const Item*>(other.weapon.get())) {
+        weapon = other.weapon->clone();
+    }
+
     inventory.reserve(other.inventory.size());
     for (const auto& item : other.inventory) {
         // Only clone if it's actually an Item to prevent infinite recursion
@@ -69,6 +79,7 @@ void Character::interact(GameEntity& other) {
         if (inventory.size() >= getMaxInventorySize()) {
             removeOldestItem();
         }
+        // Only add Items to inventory to prevent infinite recursion
         inventory.push_back(std::unique_ptr<GameEntity>(item->clone()));
     }
 }
@@ -110,8 +121,7 @@ size_t Character::getMaxInventorySize() {
 
 void Character::print(std::ostream& os) const {
     GameEntity::print(os);
-    auto [x, y] = getScreenPosition();
-    os << " ScreenPos: (" << x << ", " << y << ")";
+    os << " ScreenPos: (" << std::get<0>(screenPos) << ", " << std::get<1>(screenPos) << ")";
     if (weapon) {
         os << " Weapon: " << *weapon;
     }
