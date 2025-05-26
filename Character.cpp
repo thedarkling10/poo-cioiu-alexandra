@@ -8,24 +8,14 @@ const int Character::healIntervalSeconds = 5;
 Character::Character(int winWidth, int winHeight, std::unique_ptr<GameEntity> w)
     : GameEntity({}, "Character", 4.0f),
       screenPos(winWidth/2.0f, winHeight/2.0f),
-      weapon(nullptr),  // Initialize to nullptr first
-      lastHealTime(std::chrono::steady_clock::now()) {
-    // Only assign weapon if it's actually an Item to prevent recursion
-    if (w && dynamic_cast<Item*>(w.get())) {
-        weapon = std::move(w);
-    }
-}
+      weapon(std::move(w)),
+      lastHealTime(std::chrono::steady_clock::now()) {}
 
 Character::Character(const Character& other)
     : GameEntity(other),
       screenPos(other.screenPos),
-      weapon(nullptr), // Initialize to nullptr first
+      weapon(other.weapon ? other.weapon->clone() : nullptr),
       lastHealTime(other.lastHealTime) {
-    // Only clone weapon if it's actually an Item to prevent infinite recursion
-    if (other.weapon && dynamic_cast<const Item*>(other.weapon.get())) {
-        weapon = other.weapon->clone();
-    }
-
     inventory.reserve(other.inventory.size());
     for (const auto& item : other.inventory) {
         // Only clone if it's actually an Item to prevent infinite recursion
@@ -39,11 +29,6 @@ Character::Character(const Character& other)
 Character::Character(Character&& other) noexcept
     : Character(0, 0, nullptr) {
     swap(other);
-}
-
-Character& Character::operator=(Character other) {
-    swap(other);
-    return *this;
 }
 
 void Character::swap(Character& other) noexcept {
@@ -101,7 +86,7 @@ void Character::move(float dx, float dy) {
 
 void Character::addItem(std::unique_ptr<GameEntity> item) {
     // Only add Items to inventory to prevent infinite recursion
-    if (dynamic_cast<Item*>(item.get())) {
+    if (item && dynamic_cast<Item*>(item.get())) {
         if (inventory.size() >= getMaxInventorySize()) {
             removeOldestItem();
         }
@@ -121,7 +106,8 @@ size_t Character::getMaxInventorySize() {
 
 void Character::print(std::ostream& os) const {
     GameEntity::print(os);
-    os << " ScreenPos: (" << std::get<0>(screenPos) << ", " << std::get<1>(screenPos) << ")";
+    auto [x, y] = getScreenPosition();
+    os << " ScreenPos: (" << x << ", " << y << ")";
     if (weapon) {
         os << " Weapon: " << *weapon;
     }
