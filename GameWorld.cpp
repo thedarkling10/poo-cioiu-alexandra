@@ -226,45 +226,38 @@ void GameWorld::handleAttack() {
 }
 
 void GameWorld::handleUseItem() {
-    if (player->getInventory().empty()) {
+    const auto& inventory = player->getInventory();
+
+    if (inventory.empty()) {
         std::cout << "Your inventory is empty.\n";
         return;
     }
 
     std::cout << "Your inventory:\n";
-    for (size_t i = 0; i < player->getInventory().size(); ++i) {
-        if (player->getInventory()[i]) {
-            std::cout << i + 1 << ". " << *player->getInventory()[i] << "\n";
-        }
+    for (size_t i = 0; i < inventory.size(); ++i) {
+        std::cout << i + 1 << ". " << *inventory[i] << "\n";
     }
 
-    size_t choice = 0;
-    while (true) {
-        std::cout << "Enter item number to use (0 to cancel): ";
-        if (!(std::cin >> choice)) {
-            std::cin.clear();
-            std::cin.ignore(INT_MAX, '\n');
-            std::cout << "Invalid input. Please enter a number.\n";
-            continue;
-        }
-        std::cin.ignore(INT_MAX, '\n');
+    std::cout << "Enter item number to use (0 to cancel): ";
+    size_t choice;
+    std::cin >> choice;
 
-        if (choice == 0) {
-            std::cout << "Cancelled.\n";
-            return;
-        }
-
-        if (choice > 0 && choice <= player->getInventory().size()) {
-            break;
-        }
-        std::cout << "Invalid choice. Please select a valid item number.\n";
+    if (std::cin.fail()) {
+        std::cin.clear();
+        std::cin.ignore(10000, '\n');
+        throw std::invalid_argument("Invalid item selection");
     }
 
-    try {
-        player->useItemFromInventory(choice - 1);
-    } catch (const std::exception& e) {
-        std::cerr << "Error using item: " << e.what() << "\n";
+    if (choice == 0) {
+        std::cout << "Cancelled.\n";
+        return;
     }
+
+    if (choice > inventory.size()) {
+        throw std::out_of_range("Invalid item index");
+    }
+
+    player->useItemFromInventory(choice - 1);
 }
 
 void GameWorld::handleTalkToNPC() {
