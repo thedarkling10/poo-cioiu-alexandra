@@ -42,22 +42,6 @@ std::vector<EntityType*> findEntitiesByType(const std::vector<std::unique_ptr<Ga
     return found;
 }
 
-template<typename EntityType, typename Operation>
-void applyToEntitiesOfType(const std::vector<std::unique_ptr<GameEntity>>& entities,
-                          Operation op) {
-    try {
-        for (const auto& entity : entities) {
-            if (entity) {
-                EntityType* typed = dynamic_cast<EntityType*>(entity.get());
-                if (typed) {
-                    op(*typed);
-                }
-            }
-        }
-    } catch (const std::exception& e) {
-        throw TypedGameException<std::string>("Error in applyToEntitiesOfType", e.what());
-    }
-}
 
 template<typename T>
 void validateNumericRange(const T& value, const T& min, const T& max, const std::string& context) {
@@ -68,18 +52,5 @@ void validateNumericRange(const T& value, const T& min, const T& max, const std:
     }
 }
 
-template<typename T, typename... Args>
-std::unique_ptr<T> createValidatedObject(Args&&... args) {
-    try {
-        auto obj = std::make_unique<T>(std::forward<Args>(args)...);
 
-        if constexpr (requires { obj->validate(); }) {
-            obj->validate();
-        }
-
-        return obj;
-    } catch (const std::exception& e) {
-        throw TypedGameException<std::string>("Failed to create validated object", e.what());
-    }
-}
 #endif //UTILES_H

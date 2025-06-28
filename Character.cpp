@@ -122,6 +122,16 @@ void Character::useItemFromInventory(size_t index) {
         if (!item) {
             throw TypedGameException<size_t>("Null item at inventory index", index);
         }
+        else {
+            try {
+                auto* item = safeCast<Item>(inventory[index].get());
+
+                item->upgradeItem(5.0f);
+                item->specialAttack();
+            }catch (const TypedGameException<std::string>& e) {
+                std::cerr << "Item usage error: " << e.what() << "\n";
+            }
+        }
 
         if (auto* concreteItem = dynamic_cast<Item*>(item.get())) {
             concreteItem->interact(*this);
@@ -143,6 +153,7 @@ void Character::useItemFromInventory(size_t index) {
         std::cout << "Inventory error: " << e.getDetailedMessage() << "\n";
         throw;
     }
+
 }
 
 void Character::attack() const {

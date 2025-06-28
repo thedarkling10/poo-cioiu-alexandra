@@ -33,7 +33,12 @@ void GameWorld::initialize() {
 
         items.push_back(std::make_unique<Item>("Excalibur", std::vector<float>{10.0f, 20.0f}, 50.0f, 0.0f));
         items.push_back(std::make_unique<Item>("Health Potion", std::vector<float>{15.0f, 25.0f}, 0.0f, 25.0f));
-        //items[0]->upgradeItem(10.0f);
+
+        if (!items.empty()) {
+            if (auto* item = safeCast<Item>(items[0].get())) {
+                item->upgradeItem(10.0f); // Now this will work
+            }
+        }
 
         std::cout << termcolor::cyan << "Game World initialized successfully!\n" << termcolor::reset;
 
@@ -191,11 +196,11 @@ void GameWorld::handleMove() {
         std::cout << "Moved, but position tracking is invalid\n";
     }
 
-    // Random encounter while moving
     if (chanceDist(rng) == 1) {
         std::cout << termcolor::yellow << "A wild enemy appears and slashes you!\n" << termcolor::reset;
         player->takeDamage(5.0f);
     }
+
 }
 
 void GameWorld::handleAttack() {
@@ -312,10 +317,21 @@ void GameWorld::processNearbyEntities() {
         }
     }
 
-    auto nearbyItems = findEntitiesByType<Item>(items);  // Now used
+    auto nearbyItems = findEntitiesByType<Item>(items);
     for (auto* item : nearbyItems) {
         if (areClose(*player, *item)) {
-            item->interact(*player);
+            try {
+                auto* safeItem = safeCast<Item>(item);
+                safeItem->interact(*player);
+
+                // Example usage of other Item functions
+                if (safeItem->isEquipped()) {
+                    safeItem->specialAttack();
+                }
+            }
+            catch (const TypedGameException<std::string>& e) {
+                std::cerr << "Item interaction failed: " << e.what() << "\n";
+            }
         }
     }
 
