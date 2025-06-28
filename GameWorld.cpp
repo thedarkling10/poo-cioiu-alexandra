@@ -123,18 +123,24 @@ bool GameWorld::areClose(const GameEntity& a, const GameEntity& b) const {
 }
 
 void GameWorld::spawnRandomItem() {
-    if (!player || items.size() >= 5) return;
+    if (!player || player->getPosition().size() < 2 || items.size() >= 5) {
+        return;
+    }
 
-    auto newItem = std::make_unique<Item>(
-        "Random Health Potion",
-        std::vector<float>{
-            player->getPosition()[0] + static_cast<float>(std::uniform_int_distribution<>(-20, 20)(rng)),
-            player->getPosition()[1] + static_cast<float>(std::uniform_int_distribution<>(-20, 20)(rng))
-        },
-        0.0f, 25.0f
-    );
-    items.push_back(std::move(newItem));
-    std::cout << termcolor::green << "A shimmering potion materializes nearby!\n" << termcolor::reset;
+    try {
+        auto newItem = std::make_unique<Item>(
+            "Random Health Potion",
+            std::vector<float>{
+                player->getPosition()[0] + static_cast<float>(std::uniform_int_distribution<>(-20, 20)(rng)),
+                player->getPosition()[1] + static_cast<float>(std::uniform_int_distribution<>(-20, 20)(rng))
+            },
+            0.0f, 25.0f
+        );
+        items.push_back(std::move(newItem));
+        std::cout << termcolor::green << "A shimmering potion materializes nearby!\n" << termcolor::reset;
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to spawn item: " << e.what() << "\n";
+    }
 }
 
 void GameWorld::updateEntities(float deltaTime) {
