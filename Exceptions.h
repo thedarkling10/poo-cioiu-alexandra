@@ -36,8 +36,6 @@ public:
     explicit TypedGameException(const std::string& msg, const T& data)
         : GameException(msg), errorData(data) {}
 
-    const T& getErrorData() const { return errorData; }
-
     std::string getDetailedMessage() const {
         std::ostringstream oss;
         oss << what() << " [Error Data: " << errorData << "]";

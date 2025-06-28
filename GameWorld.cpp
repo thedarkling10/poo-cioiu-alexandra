@@ -34,7 +34,7 @@ void GameWorld::initialize() {
         items.push_back(std::make_unique<Item>("Excalibur", std::vector<float>{10.0f, 20.0f}, 50.0f, 0.0f));
         items.push_back(std::make_unique<Item>("Health Potion", std::vector<float>{15.0f, 25.0f}, 0.0f, 25.0f));
 
-        if (items.size() > 0 && items[0] != nullptr) {
+        if (items.empty() && items[0] != nullptr) {
             if (auto* item = dynamic_cast<Item*>(items[0].get())) {
                 try {
                     item->upgradeItem(10.0f);
