@@ -30,7 +30,6 @@ public:
     [[nodiscard]] std::unique_ptr<GameEntity> clone() const override;
     void update(float deltaTime) override;
 
-    void removeOldestItem();
     void addItem(std::unique_ptr<GameEntity> item);
     void useItemFromInventory(size_t index);
 

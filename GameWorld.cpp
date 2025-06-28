@@ -1,4 +1,5 @@
 #include "GameWorld.h"
+#include "Utiles.h"
 #include "Item.h"
 #include "Enemy.h"
 #include "NPC.h"
@@ -32,6 +33,7 @@ void GameWorld::initialize() {
 
         items.push_back(std::make_unique<Item>("Excalibur", std::vector<float>{10.0f, 20.0f}, 50.0f, 0.0f));
         items.push_back(std::make_unique<Item>("Health Potion", std::vector<float>{15.0f, 25.0f}, 0.0f, 25.0f));
+        //items[0]->upgradeItem(10.0f);
 
         std::cout << termcolor::cyan << "Game World initialized successfully!\n" << termcolor::reset;
 
@@ -146,7 +148,7 @@ void GameWorld::updateEntities(float deltaTime) {
             entities.end()
         );
 
-    } catch (const DeadEntityException& e) {
+    } catch (const DeadEntityException&) {
         throw;
     }
 }
@@ -202,7 +204,7 @@ void GameWorld::handleAttack() {
 
     for (auto& entity : entities) {
         if (entity && areClose(*player, *entity)) {
-            if (auto* enemy = dynamic_cast<Enemy*>(entity.get())) {
+            if (dynamic_cast<Enemy*>(entity.get())) {
                 std::cout << "You engage in combat with " << entity->getName() << "!\n";
                 player->attack();
                 entity->interact(*player);
@@ -276,7 +278,7 @@ void GameWorld::handleTalkToNPC() {
                             player->addItem(std::move(giftedPotion));
                             std::cout << "You received a Health Potion from the merchant that restores "
                                       << healAmount << " HP!\n";
-                        } catch (const InventoryFullException& e) {
+                        } catch (const InventoryFullException&) {
                             std::cout << "Your inventory is full. Merchant frowns and puts the potion away.\n";
                             throw;
                         }
@@ -307,6 +309,13 @@ void GameWorld::processNearbyEntities() {
             }
         } else {
             ++it;
+        }
+    }
+
+    auto nearbyItems = findEntitiesByType<Item>(items);  // Now used
+    for (auto* item : nearbyItems) {
+        if (areClose(*player, *item)) {
+            item->interact(*player);
         }
     }
 

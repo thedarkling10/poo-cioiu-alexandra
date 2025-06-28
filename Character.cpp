@@ -55,11 +55,6 @@ void Character::update(float deltaTime) {
     autoHeal();
 }
 
-void Character::removeOldestItem() {
-    if (!inventory.empty()) {
-        inventory.erase(inventory.begin());
-    }
-}
 
 void Character::onInteractWith(GameEntity& other) {
     std::cout << name << " interacts with " << other.getName() << "\n";
@@ -138,7 +133,9 @@ void Character::useItemFromInventory(size_t index) {
         } else {
             item->interact(*this);
         }
-
+    } catch (const TypedGameException<size_t>& e) {
+        std::cout << "Error at index: " << e.getErrorData() << "\n";  // Now used
+        throw;
     } catch (const InvalidValueException& e) {
         std::cout << "Invalid inventory access: " << e.getDetailedMessage() << "\n";
         throw;
@@ -150,7 +147,12 @@ void Character::useItemFromInventory(size_t index) {
 
 void Character::attack() const {
     if (weapon) {
-        const_cast<GameEntity*>(weapon.get())->interact(const_cast<Character&>(*this));
+        if (auto* weaponItem = dynamic_cast<Item*>(weapon.get())) {
+            if (weaponItem->isEquipped()) {
+                weaponItem->specialAttack();
+            }
+        }
+        weapon->interact(const_cast<Character&>(*this));
     }
 }
 

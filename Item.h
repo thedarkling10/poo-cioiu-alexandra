@@ -18,9 +18,6 @@ public:
 
     [[nodiscard]] std::unique_ptr<GameEntity> clone() const override;
     void update(float deltaTime) override;
-
-    void equipItem();
-    void unequipItem();
     void upgradeItem(float percent);
     void specialAttack() const;
 

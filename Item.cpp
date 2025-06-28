@@ -28,14 +28,6 @@ void Item::onInteractWithCharacter(Character& character) {
     }
 }
 
-void Item::equipItem() {
-    equipped = true;
-}
-
-void Item::unequipItem() {
-    equipped = false;
-}
-
 void Item::upgradeItem(float percent) {
     damage *= (1.0f + percent / 100.0f);
     healAmount *= (1.0f + percent / 100.0f);
@@ -47,6 +39,5 @@ void Item::specialAttack() const {
 
 void Item::print(std::ostream& os) const {
     GameEntity::print(os);
-    os << " Damage: " << damage << " Heal: " << healAmount
-       << " Equipped: " << (equipped ? "Yes" : "No");
+    os << " Damage: " << damage << " Heal: " << healAmount;
 }
