@@ -98,7 +98,7 @@ void Character::addItem(std::unique_ptr<GameEntity> item) {
     }
 
     try {
-        if (auto* concreteItem = dynamic_cast<Item*>(item.get())) {
+        if (auto* const concreteItem = dynamic_cast<const Item*>(item.get())) {
             validateNumericRange(concreteItem->getDamage(), 0.0f, 1000.0f, "item damage");
             validateNumericRange(concreteItem->getHealingAmount(), 0.0f, 500.0f, "item healing");
 
