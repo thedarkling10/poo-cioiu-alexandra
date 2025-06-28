@@ -67,11 +67,11 @@ void GameWorld::run() {
             int choice;
             std::cin >> choice;
 
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cin.ignore(10000, '\n');
 
             if (std::cin.fail()) {
                 std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cin.ignore(10000, '\n');
                 throw std::invalid_argument("Invalid input");
             }
 
@@ -100,7 +100,7 @@ void GameWorld::run() {
         } catch (const std::exception& e) {
             std::cerr << termcolor::red << "Error: " << e.what() << termcolor::reset << "\n";
             std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cin.ignore(10000, '\n');
         }
     }
     if (!player->isAlive()) {
@@ -183,7 +183,7 @@ void GameWorld::handleMove() {
 
     if (!(std::cin >> dx >> dy)) {
         std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.ignore(10000, '\n');
         throw std::invalid_argument("Invalid movement input");
     }
 
