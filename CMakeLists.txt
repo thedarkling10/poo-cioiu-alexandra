@@ -40,6 +40,9 @@ set(PROJECT_SOURCES
         InteractiveObject.h
         NPC.cpp
         NPC.h
+        GameWorld.cpp
+        GameWorld.h
+        Utiles.h
 )
 
 # Add executable target

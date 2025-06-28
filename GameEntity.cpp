@@ -1,7 +1,16 @@
 #include "GameEntity.h"
+#include "Character.h"
 
 GameEntity::GameEntity(std::vector<float> pos, std::string n, float s, float h)
     : position(std::move(pos)), name(std::move(n)), scale(s), health(h), alive(true) {}
+
+void GameEntity::interact(GameEntity& other) {
+    if (auto* character = dynamic_cast<Character*>(&other)) {
+        onInteractWithCharacter(*character);
+    } else {
+        onInteractWith(other);
+    }
+}
 
 void GameEntity::takeDamage(float damage) {
     health -= damage;

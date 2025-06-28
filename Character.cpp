@@ -1,4 +1,5 @@
 #include "Character.h"
+#include "Utiles.h"
 #include "Item.h"
 #include "Exceptions.h"
 #include <algorithm>
@@ -47,6 +48,9 @@ std::unique_ptr<GameEntity> Character::clone() const {
 }
 
 void Character::update(float deltaTime) {
+    if (!alive) {
+        throw DeadEntityException("Cannot update dead character");
+    }
     (void)deltaTime;
     autoHeal();
 }
@@ -57,13 +61,12 @@ void Character::removeOldestItem() {
     }
 }
 
-void Character::interact(GameEntity& other) {
-    if (const auto* const item = dynamic_cast<const Item*>(&other)) {
-        if (inventory.size() >= getMaxInventorySize()) {
-            removeOldestItem();
-        }
-        inventory.push_back(std::unique_ptr<GameEntity>(item->clone()));
-    }
+void Character::onInteractWith(GameEntity& other) {
+    std::cout << name << " interacts with " << other.getName() << "\n";
+}
+
+void Character::onInteractWithCharacter(Character& character) {
+    std::cout << name << " interacts with " << character.getName() << "\n";
 }
 
 void Character::autoHeal() {
@@ -79,15 +82,69 @@ void Character::autoHeal() {
 void Character::move(float dx, float dy) {
     std::get<0>(screenPos) += dx;
     std::get<1>(screenPos) += dy;
+
+    if (position.size() < 2) {
+        position.resize(2, 0.0f);
+    }
+    position[0] += dx;
+    position[1] += dy;
 }
 
 void Character::addItem(std::unique_ptr<GameEntity> item) {
-    // Only add Items to inventory to prevent infinite recursion
-    if (item && dynamic_cast<Item*>(item.get())) {
-        if (inventory.size() >= getMaxInventorySize()) {
-            removeOldestItem();
+    if (!item) {
+        throw TypedGameException<std::string>("Cannot add null item", "Character::addItem");
+    }
+
+    if (inventory.size() >= getMaxInventorySize()) {
+        throw InventoryFullException("Cannot add item " + item->getName() +
+                                   ", inventory is full (" +
+                                   std::to_string(inventory.size()) + "/" +
+                                   std::to_string(getMaxInventorySize()) + ")");
+    }
+
+    try {
+        if (auto* concreteItem = dynamic_cast<Item*>(item.get())) {
+            validateNumericRange(concreteItem->getDamage(), 0.0f, 1000.0f, "item damage");
+            validateNumericRange(concreteItem->getHealingAmount(), 0.0f, 500.0f, "item healing");
+
+            inventory.push_back(std::move(item));
+            std::cout << "Added item to inventory: " << concreteItem->getName() << "\n";
+        } else {
+            throw TypedGameException<std::string>("Invalid item type for character inventory",
+                                                item->getName());
         }
-        inventory.push_back(std::move(item));
+    } catch (const InvalidValueException& e) {
+        std::cout << "Item validation failed: " << e.getDetailedMessage() << "\n";
+        throw;
+    }
+}
+
+void Character::useItemFromInventory(size_t index) {
+    try {
+        validateNumericRange(index, size_t{0}, inventory.size() - 1, "inventory index");
+
+        auto& item = inventory[index];
+        if (!item) {
+            throw TypedGameException<size_t>("Null item at inventory index", index);
+        }
+
+        if (auto* concreteItem = dynamic_cast<Item*>(item.get())) {
+            concreteItem->interact(*this);
+
+            if (concreteItem->getHealingAmount() > 0.0f) {
+                inventory.erase(inventory.begin() + index);
+                std::cout << "Consumed " << concreteItem->getName() << "\n";
+            }
+        } else {
+            item->interact(*this);
+        }
+
+    } catch (const InvalidValueException& e) {
+        std::cout << "Invalid inventory access: " << e.getDetailedMessage() << "\n";
+        throw;
+    } catch (const TypedGameException<size_t>& e) {
+        std::cout << "Inventory error: " << e.getDetailedMessage() << "\n";
+        throw;
     }
 }
 
@@ -108,4 +165,5 @@ void Character::print(std::ostream& os) const {
     if (weapon) {
         os << " Weapon: " << *weapon;
     }
+    os << " Inventory size: " << inventory.size() << "/" << getMaxInventorySize();
 }

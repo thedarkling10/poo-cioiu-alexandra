@@ -1,4 +1,5 @@
 #include "Obstacle.h"
+#include "Character.h"
 
 Obstacle::Obstacle(std::vector<float> pos, std::string n)
     : GameEntity(std::move(pos), std::move(n), 1.0f),
@@ -12,10 +13,12 @@ void Obstacle::update(float deltaTime) {
     (void)deltaTime;
 }
 
-void Obstacle::interact(GameEntity& other) {
-    if (auto* character = dynamic_cast<Character*>(&other)) {
-        checkDangerZone(*character);
-    }
+void Obstacle::onInteractWith(GameEntity& other) {
+    std::cout << other.getName() << " encounters obstacle " << name << "\n";
+}
+
+void Obstacle::onInteractWithCharacter(Character& character) {
+    checkDangerZone(character);
 }
 
 bool Obstacle::reach(float x, float y) const {

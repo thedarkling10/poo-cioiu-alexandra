@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "Character.h"
 
 Enemy::Enemy(std::vector<float> pos)
     : GameEntity(std::move(pos), "Enemy", 1.0f, 100.0f),
@@ -16,11 +17,13 @@ void Enemy::update(float deltaTime) {
     }
 }
 
+void Enemy::onInteractWith(GameEntity& other) {
+    // Default interaction with generic GameEntity
+    std::cout << name << " encounters " << other.getName() << "\n";
+}
 
-void Enemy::interact(GameEntity& other) {
-    if (auto* character = dynamic_cast<Character*>(&other)) {
-        attack(*character);
-    }
+void Enemy::onInteractWithCharacter(Character& character) {
+    attack(character);
 }
 
 void Enemy::attack(Character& target) const {
@@ -30,6 +33,7 @@ void Enemy::attack(Character& target) const {
 
     if (alive && distanceSquared <= radius * radius) {
         target.takeDamage(damagePerSec);
+        std::cout << name << " attacks " << target.getName() << " for " << damagePerSec << " damage!\n";
     }
 }
 
