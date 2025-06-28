@@ -123,21 +123,19 @@ void Character::useItemFromInventory(size_t index) {
             throw TypedGameException<size_t>("Null item at inventory index", index);
         }
 
-        try {
-            if (const auto* concreteItem = dynamic_cast<const Item*>(item.get())) {
-                const_cast<Item*>(concreteItem)->interact(*this);
+        std::string itemName = item->getName();
+        bool isConsumable = false;
 
-                if (concreteItem->getHealingAmount() > 0.0f) {
-                    inventory.erase(inventory.begin() + index);
-                    std::cout << "Consumed " << concreteItem->getName() << "\n";
-                }
-            } else {
-                item->interact(*this);
-            }
+        if (const auto* concreteItem = dynamic_cast<const Item*>(item.get())) {
+            const_cast<Item*>(concreteItem)->interact(*this);
+            isConsumable = (concreteItem->getHealingAmount() > 0.0f);
+        } else {
+            item->interact(*this);
         }
-        catch (const InvalidValueException& e) {
-            std::cout << "Item usage failed: " << e.what() << "\n";
-            throw;
+
+        if (isConsumable) {
+            inventory.erase(inventory.begin() + index);
+            std::cout << "Consumed " << itemName << "\n";  // Use stored name
         }
     }
     catch (const TypedGameException<size_t>& e) {
