@@ -21,8 +21,9 @@ void GameEntity::takeDamage(float damage) {
 }
 
 void GameEntity::heal(float amount) {
-    health = std::min(health + amount, 100.0f);
+    health = (std::min)(health + amount, 100.0f);
 }
+
 
 void GameEntity::printPosition() const {
     std::cout << name << " at ";
@@ -34,13 +35,9 @@ void GameEntity::printPosition() const {
 
 void GameEntity::print(std::ostream& os) const {
     os << name << " [";
-    if (!position.empty()) {  // Check if position vector has data
-        for (size_t i = 0; i < position.size(); ++i) {
-            os << position[i];
-            if (i < position.size() - 1) os << ", ";
-        }
-    } else {
-        os << "no position";
+    for (size_t i = 0; i < position.size(); ++i) {
+        os << position[i];
+        if (i < position.size() - 1) os << ", ";
     }
     os << "] Scale: " << scale << " Health: " << health;
 }
