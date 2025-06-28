@@ -187,7 +187,7 @@ void GameWorld::handleMove() {
         throw std::invalid_argument("Invalid movement input");
     }
 
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cin.ignore(10000, '\n');
 
     player->move(dx, dy);
 
