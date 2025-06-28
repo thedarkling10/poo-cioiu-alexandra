@@ -1,3 +1,6 @@
+#ifdef _WIN32
+#define NOMINMAX
+#endif
 #include "GameWorld.h"
 #include "Utiles.h"
 #include "Item.h"
