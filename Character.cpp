@@ -122,38 +122,33 @@ void Character::useItemFromInventory(size_t index) {
         if (!item) {
             throw TypedGameException<size_t>("Null item at inventory index", index);
         }
-        else {
-            try {
-                auto* item = safeCast<Item>(inventory[index].get());
 
-                item->upgradeItem(5.0f);
-                item->specialAttack();
-            }catch (const TypedGameException<std::string>& e) {
-                std::cerr << "Item usage error: " << e.what() << "\n";
+        // Single try-catch block with proper ordering
+        try {
+            if (auto* concreteItem = dynamic_cast<Item*>(item.get())) {
+                concreteItem->interact(*this);
+
+                if (concreteItem->getHealingAmount() > 0.0f) {
+                    inventory.erase(inventory.begin() + index);
+                    std::cout << "Consumed " << concreteItem->getName() << "\n";
+                }
+            } else {
+                item->interact(*this);
             }
         }
-
-        if (auto* concreteItem = dynamic_cast<Item*>(item.get())) {
-            concreteItem->interact(*this);
-
-            if (concreteItem->getHealingAmount() > 0.0f) {
-                inventory.erase(inventory.begin() + index);
-                std::cout << "Consumed " << concreteItem->getName() << "\n";
-            }
-        } else {
-            item->interact(*this);
+        catch (const InvalidValueException& e) {
+            std::cout << "Item usage failed: " << e.what() << "\n";
+            throw;
         }
-    } catch (const TypedGameException<size_t>& e) {
-        std::cout << "Error at index: " << e.getErrorData() << "\n";  // Now used
-        throw;
-    } catch (const InvalidValueException& e) {
-        std::cout << "Invalid inventory access: " << e.getDetailedMessage() << "\n";
-        throw;
-    } catch (const TypedGameException<size_t>& e) {
+    }
+    catch (const TypedGameException<size_t>& e) {
         std::cout << "Inventory error: " << e.getDetailedMessage() << "\n";
         throw;
     }
-
+    catch (const std::exception& e) {
+        std::cout << "Error using item: " << e.what() << "\n";
+        throw;
+    }
 }
 
 void Character::attack() const {

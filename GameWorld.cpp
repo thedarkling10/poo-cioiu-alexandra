@@ -34,9 +34,13 @@ void GameWorld::initialize() {
         items.push_back(std::make_unique<Item>("Excalibur", std::vector<float>{10.0f, 20.0f}, 50.0f, 0.0f));
         items.push_back(std::make_unique<Item>("Health Potion", std::vector<float>{15.0f, 25.0f}, 0.0f, 25.0f));
 
-        if (!items.empty()) {
-            if (auto* item = safeCast<Item>(items[0].get())) {
-                item->upgradeItem(10.0f); // Now this will work
+        if (items.size() > 0 && items[0] != nullptr) {
+            if (auto* item = dynamic_cast<Item*>(items[0].get())) {
+                try {
+                    item->upgradeItem(10.0f);
+                } catch (const std::exception& e) {
+                    std::cerr << "Item upgrade failed: " << e.what() << "\n";
+                }
             }
         }
 
@@ -263,7 +267,7 @@ void GameWorld::handleTalkToNPC() {
 
     for (auto& entity : entities) {
         if (entity && areClose(*player, *entity)) {
-            if (auto* npc = dynamic_cast<NPC*>(entity.get())) {
+            if (const auto* npc = dynamic_cast<const NPC*>(entity.get())) {
                 foundNPC = true;
                 entity->interact(*player);
 
