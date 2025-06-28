@@ -34,9 +34,13 @@ void GameEntity::printPosition() const {
 
 void GameEntity::print(std::ostream& os) const {
     os << name << " [";
-    for (size_t i = 0; i < position.size(); ++i) {
-        os << position[i];
-        if (i < position.size() - 1) os << ", ";
+    if (!position.empty()) {  // Check if position vector has data
+        for (size_t i = 0; i < position.size(); ++i) {
+            os << position[i];
+            if (i < position.size() - 1) os << ", ";
+        }
+    } else {
+        os << "no position";
     }
     os << "] Scale: " << scale << " Health: " << health;
 }
