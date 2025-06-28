@@ -123,10 +123,9 @@ void Character::useItemFromInventory(size_t index) {
             throw TypedGameException<size_t>("Null item at inventory index", index);
         }
 
-        // Single try-catch block with proper ordering
         try {
-            if (auto* concreteItem = dynamic_cast<Item*>(item.get())) {
-                concreteItem->interact(*this);
+            if (const auto* concreteItem = dynamic_cast<const Item*>(item.get())) {
+                const_cast<Item*>(concreteItem)->interact(*this);
 
                 if (concreteItem->getHealingAmount() > 0.0f) {
                     inventory.erase(inventory.begin() + index);
@@ -153,12 +152,13 @@ void Character::useItemFromInventory(size_t index) {
 
 void Character::attack() const {
     if (weapon) {
-        if (auto* weaponItem = dynamic_cast<Item*>(weapon.get())) {
+        if (const auto* weaponItem = dynamic_cast<const Item*>(weapon.get())) {
+            const_cast<Item*>(weaponItem)->interact(const_cast<Character&>(*this));
+
             if (weaponItem->isEquipped()) {
-                weaponItem->specialAttack();
+                std::cout << "Using equipped weapon\n";
             }
         }
-        weapon->interact(const_cast<Character&>(*this));
     }
 }
 
