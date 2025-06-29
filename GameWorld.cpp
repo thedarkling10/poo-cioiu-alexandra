@@ -332,7 +332,6 @@ void GameWorld::processNearbyEntities() {
                 auto* safeItem = safeCast<Item>(item);
                 safeItem->interact(*player);
 
-                // Example usage of other Item functions
                 if (safeItem->isEquipped()) {
                     safeItem->specialAttack();
                 }
