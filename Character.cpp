@@ -135,7 +135,7 @@ void Character::useItemFromInventory(size_t index) {
 
         if (isConsumable) {
             inventory.erase(inventory.begin() + index);
-            std::cout << "Consumed " << itemName << "\n";  // Use stored name
+            std::cout << "Consumed " << itemName << "\n";
         }
     }
     catch (const TypedGameException<size_t>& e) {

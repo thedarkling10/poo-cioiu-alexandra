@@ -10,8 +10,8 @@
 
 class GameWorld {
     std::unique_ptr<Character> player;
-    std::vector<std::unique_ptr<GameEntity>> entities; // Uniform access to all objects
-    std::vector<std::unique_ptr<GameEntity>> items;    // Items on the ground
+    std::vector<std::unique_ptr<GameEntity>> entities;
+    std::vector<std::unique_ptr<GameEntity>> items;
     std::mt19937 rng;
     std::uniform_int_distribution<> chanceDist;
     int turnCount;

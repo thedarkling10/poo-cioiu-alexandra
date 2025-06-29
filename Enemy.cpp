@@ -18,7 +18,6 @@ void Enemy::update(float deltaTime) {
 }
 
 void Enemy::onInteractWith(GameEntity& other) {
-    // Default interaction with generic GameEntity
     std::cout << name << " encounters " << other.getName() << "\n";
 }
 

@@ -4,7 +4,6 @@
 #include "GameEntity.h"
 
 class Enemy : public GameEntity {
-private:
     float speed;
     float damagePerSec;
     float radius;
