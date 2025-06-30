@@ -43,6 +43,8 @@ set(PROJECT_SOURCES
         GameWorld.cpp
         GameWorld.h
         Utiles.h
+        Interaction_Strategy.h
+        Observer.h
 )
 
 # Add executable target

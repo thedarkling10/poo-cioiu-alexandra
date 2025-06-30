@@ -16,9 +16,9 @@ class GameWorld {
     std::uniform_int_distribution<> chanceDist;
     int turnCount;
     bool gameRunning;
-    
+
     static constexpr float INTERACTION_DISTANCE = 50.0f;
-    
+
     bool areClose(const GameEntity& a, const GameEntity& b) const;
     void spawnRandomItem();
     void updateEntities(float deltaTime);
